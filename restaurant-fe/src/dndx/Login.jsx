@@ -31,14 +31,14 @@ const Login = () => {
             type="submit"
             className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition cursor-pointer"
           >
-            Đăng nhập
+            Dawng nhapppppppp
           </button>
         </form>
 
         <p className="text-center text-gray-600 mt-4">
           Chưa có tài khoản?{" "}
           <a href="/Signup" className="text-red-600 hover:underline cursor-pointer">
-            Đăng ký ngay
+            Đăng ký ngay luon de adasdasdasdasdasd
           </a>
         </p>
       </div>
