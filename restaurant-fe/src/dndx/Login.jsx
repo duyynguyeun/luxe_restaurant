@@ -38,7 +38,7 @@ const Login = () => {
         <p className="text-center text-gray-600 mt-4">
           Chưa có tài khoản?{" "}
           <a href="/Signup" className="text-red-600 hover:underline cursor-pointer">
-            Đăng ký ngay
+            Đăng ký ngay luon de
           </a>
         </p>
       </div>
