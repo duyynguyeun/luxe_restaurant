@@ -33,7 +33,7 @@ const FeaturedMenu = () => {
           modules={[Navigation, Autoplay]}
           spaceBetween={20}       // khoảng cách giữa các item
           slidesPerView={4}       // luôn hiện 4 món
-          navigation              // bật mũi tên
+          // navigation              // bật mũi tên
           loop={true}             // chạy vòng lặp
           autoplay={{
             delay: 3000,          // auto slide mỗi 3s
