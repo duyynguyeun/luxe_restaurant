@@ -8,7 +8,7 @@ const Footer = () => {
         
         {/* Logo + mô tả */}
         <div>
-          <h2 className="text-2xl font-bold mb-3">Nhà hàng Việt</h2>
+          <h2 className="text-2xl font-bold mb-3">Luxe Restaurant</h2>
           <p className="text-sm text-gray-200">
             Mang hương vị ẩm thực truyền thống Việt Nam đến với mọi người.
           </p>
@@ -41,7 +41,7 @@ const Footer = () => {
 
       {/* Bản quyền */}
       <div className="border-t border-gray-600 mt-6 pt-4 text-center text-sm text-gray-300">
-        © {new Date().getFullYear()} Nhà hàng Việt. All rights reserved.
+        © {new Date().getFullYear()} Luxe Restaurant. All rights reserved.
       </div>
     </footer>
   );
