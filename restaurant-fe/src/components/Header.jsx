@@ -1,12 +1,12 @@
 import React from "react";
-import logo from "../assets/logo.jpg"
+import logo from "../assets/logo.png"
 
 const Header = () => {
   return (
     <header className="bg-[#174C34] shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <a href="/" className="text-2xl font-bold text-white"><img src="logo.jpg" alt="logo.jpg" /></a>
+        <a href="/" className="text-2xl font-bold text-white"><img className="h-10 w-full" src={logo} alt="logo" /></a>
 
         {/* Menu */}
         <nav>
@@ -17,7 +17,7 @@ const Header = () => {
               </a>
             </li>
             <li>
-              <a href="/" className="text-white hover:text-yellow-300">
+              <a href="/Menu" className="text-white hover:text-yellow-300">
                 Menu
               </a>
             </li>

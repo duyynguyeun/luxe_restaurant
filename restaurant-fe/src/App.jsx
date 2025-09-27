@@ -5,12 +5,14 @@ import Login from "./dndx/Login";
 import Signup from "./dndx/Signup";
 import FeaturedMenu from "./components/FeaturedMenu";
 import Footer from "./components/Footer";
-import Datban from "./components/Datban";
+import Menu from "./components/Menu";
 
 
 
 function App() {
+
   return (
+    
     <Router>
       <Routes>
         {/* Trang chủ */}
@@ -61,16 +63,18 @@ function App() {
             </>
           }
         />
-        {/* Trang dat ban */}
-        <Route 
-          path="/datban"
-          element = {
+        <Route
+          path="/menu"
+          element={
             <>
-              <header/>
-              <Datban/>
+              <Header/>
+              <Menu/>
             </>
           }
+        
+        
         />
+       
         
       </Routes>
     </Router>

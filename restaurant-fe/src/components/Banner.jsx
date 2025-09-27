@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
+import Datban from "./Datban"
 
-const HeroSection = () => {
+const Banner = (onOpenDatBan) => {
+  const [openForm, setOpenForm] = useState(false); // quản lý trạng thái mở form
   return (
     <section
       className="relative h-screen bg-cover bg-center flex items-center justify-center"
@@ -22,7 +24,10 @@ const HeroSection = () => {
         </p>
 
         <div className="flex gap-4 justify-center">
-          <button className="bg-green-800 hover:bg-yellow-400 cursor-pointer text-white px-6 py-3 rounded-full font-semibold shadow-lg transition">
+          <button
+            onClick= {() => setOpenForm(true)} 
+            className="bg-green-800 hover:bg-yellow-400 cursor-pointer text-white px-6 py-3 rounded-full font-semibold shadow-lg transition"
+          >
             Đặt bàn ngay
           </button>
           <button className="bg-white/80 hover:bg-white cursor-pointer text-black px-6 py-3 rounded-full font-semibold shadow-lg transition">
@@ -30,8 +35,9 @@ const HeroSection = () => {
           </button>
         </div>
       </div>
+      {openForm && <Datban onClose={() => setOpenForm(false)}/>}
     </section>
   );
 };
 
-export default HeroSection;
+export default Banner;
