@@ -2,25 +2,25 @@ import React from "react";
 import { useState } from "react";
 
 
-const Banner = ({onClose}) => {
+const Datban = ({onClose}) => {
   // const [date, setDate] = useState("");
   const [Soluong,  setSoluong] = useState(1)
   const giam = () =>{
-      if(soluong > 1) setSoluong(soluong -1);
+      if(Soluong > 1) setSoluong(Soluong -1);
   };
 
   const tang = () =>{
-      setSoluong = soluong + 1;
+      setSoluong(Soluong + 1);
   }; 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative space-x-4 max-h-full overflow-y-auto">
         <div className="space-y-3">
           <h2 className="font-bold text-3xl">Đặt bàn</h2>
-          <div className="py-2">Thông tin của bạn</div>
+          <div className="py-2 text-red-500">Thông tin của bạn</div>
           <input type="text" placeholder = "Nhập tên của bạn..." className="w-full border border-gray-300 px-2 py-2 rounded-lg" />
           <input type="text" placeholder = "Nhập số điện thoại của bạn..." className="py-2 w-full border border-gray-300 px-2 rounded-lg " />
-          <div>Thông tin bàn</div>
+          <div className="text-red-500">Thông tin bàn</div>
           <div className="space-y-3">
             <div className="">Ngày đặt</div>
             <input
@@ -47,7 +47,7 @@ const Banner = ({onClose}) => {
                 +
               </button>
             </div>
-            <div>Giờ đến</div>
+            <div>Thời gian</div>
             <input type="time"
               className="border rounded px-3 py-2 "
             />
@@ -90,4 +90,4 @@ const Banner = ({onClose}) => {
   );
 };
 
-export default Banner;
+export default Datban;

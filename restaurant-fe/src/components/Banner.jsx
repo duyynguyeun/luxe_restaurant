@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Datban from "./Datban"
 
+
 const Banner = (onOpenDatBan) => {
   const [openForm, setOpenForm] = useState(false); // quản lý trạng thái mở form
   return (
@@ -30,9 +31,10 @@ const Banner = (onOpenDatBan) => {
           >
             Đặt bàn ngay
           </button>
-          <button className="bg-white/80 hover:bg-white cursor-pointer text-black px-6 py-3 rounded-full font-semibold shadow-lg transition">
-            Xem Menu
-          </button>
+          <a href="/Menu">
+            <button className="bg-white/80 hover:bg-white cursor-pointer text-black px-6 py-3 rounded-full font-semibold shadow-lg transition">
+              Xem Menu
+            </button></a>
         </div>
       </div>
       {openForm && <Datban onClose={() => setOpenForm(false)}/>}

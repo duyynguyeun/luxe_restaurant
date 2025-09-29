@@ -68,7 +68,11 @@ function App() {
           element={
             <>
               <Header/>
-              <Menu/>
+              <Menu title={'Món Á'}/>
+              <Menu title={'Món Âu'}/>
+              <Menu title={"Rau"}/>
+              <Menu title={"Rau"}/>
+              <Menu title={"Rau"}/>
             </>
           }
         
