@@ -1,49 +1,75 @@
-import React from "react";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // 1. Import hook của chúng ta
 
 const Login = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-black mb-6">
-          Đăng nhập Nhà Hàng
-        </h2>
+  const [username, setUsername] = useState(''); // Đổi email thành username
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useAuth(); // 2. Lấy hàm login "giả"
+  const navigate = useNavigate();
 
-        <form className="space-y-4">
-          <div>
-            <label className="block text-gray-700 mb-1">Tên đăng nhập</label>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+
+    // 3. Gọi hàm login "giả"
+    const success = login(username, password);
+
+    if (success) {
+      navigate('/'); // Thành công, về trang chủ
+    } else {
+      setError('Tên đăng nhập hoặc mật khẩu không đúng. (Thử: admin / 123)');
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center py-20 bg-gray-100">
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
+        <h2 className="text-3xl font-bold text-center mb-6">Đăng nhập Nhà Hàng</h2>
+        
+        {error && <p className="bg-red-100 text-red-700 p-3 rounded-lg mb-4">{error}</p>}
+        
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-2">Tên đăng nhập</label>
             <input
               type="text"
-              placeholder="Nhập tên đăng nhập của bạn"
-              className="w-full border border-gray-300 px-2 py-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+              placeholder="Nhập 'admin'"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
             />
           </div>
-
-          <div>
-            <label className="block text-gray-700 mb-1">Mật khẩu</label>
+          <div className="mb-6">
+            <label className="block text-gray-700 mb-2">Mật khẩu</label>
             <input
               type="password"
-              placeholder="Nhập mật khẩu"
-              className="w-full border border-gray-300 px-2 py-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+              placeholder="Nhập '123'"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
-
           <button
             type="submit"
-            className="w-full bg-gray-500 text-white py-2 rounded-lg transition cursor-pointer"
+            className="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors"
           >
             Đăng nhập
           </button>
         </form>
-
-        <p className="text-center text-gray-600 mt-4">
-          Chưa có tài khoản?{" "}
-          <a href="/Signup" className="text-red-600 hover:underline cursor-pointer">
+        <p className="text-center mt-6 text-gray-600">
+          Chưa có tài khoản?{' '}
+          <Link to="/signup" className="text-red-500 hover:underline font-medium">
             Đăng ký ngay
-          </a>
+          </Link>
         </p>
       </div>
     </div>
   );
-}
+};
 
 export default Login;
+

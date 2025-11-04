@@ -41,7 +41,7 @@ const ContactPage = () => {
         
         {/* === Cột thông tin bên trái === */}
         <div className="w-full md:w-2/5">
-          <h1 className="text-4xl font-extrabold text-gray-800">Tự Do Group</h1>
+          <h1 className="text-4xl font-extrabold text-gray-800">Luxury Group</h1>
           <p className="text-lg text-gray-600 mt-2">Kế toán - Tài chính</p>
           
           <div className="mt-10 space-y-4 text-gray-700">
