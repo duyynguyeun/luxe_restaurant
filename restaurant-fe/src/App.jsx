@@ -70,8 +70,8 @@ function App() {
               <Header/>
               <Menu title={'Món Á'}/>
               <Menu title={'Món Âu'}/>
-              <Menu title={"Rau"}/>
-              <Menu title={"Rau"}/>
+              <Menu title={"Rau Má"}/>
+              <Menu title={"Rau 36"}/>
               <Menu title={"Rau"}/>
             </>
           }
