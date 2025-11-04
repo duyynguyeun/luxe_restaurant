@@ -13,3 +13,11 @@ spring:
     show-sql: true
   flyway:
     baseline-on-migrate: true
+  ai:
+    openai:
+      api-key: AIzaSyDxUdZ2IZt78t1AxqvMk7Fub6yeNmkA0gk
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completions-path: v1beta/openai/chat/completions
+        options:
+          model: gemini-2.5-flash

@@ -48,60 +48,100 @@ const AuthLayout = () => (
 
 function App() {
   return (
-    // 7. BỌC CẢ 2 PROVIDER
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          {/* 8. BỌC SUSPENSE ĐỂ HIỂN THỊ HIỆU ỨNG LOADING */}
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes>
+    
+    <Router>
+      <Routes>
+        {/* Trang chủ */}
+        <Route
+          path="/"
+          element={
+            <>
+              <Header />
+              <Banner />
+              <FeaturedMenu/>
+              <Footer/>
               
-              {/* Nhóm 1: Các trang ADMIN (dùng AdminLayout) */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="menu" element={<AdminManageMenu />} />
-              </Route>
+              
+            </>
+          }
+        />
 
-              {/* Nhóm 2: Các trang USER (dùng MainLayout) */}
-              <Route element={<MainLayout />}>
-                <Route
-                  path="/"
-                  element={
-                    <>
-                      <Banner />
-                      <FeaturedMenu/>
-                    </>
-                  }
-                />
-                <Route
-                  path="/menu"
-                  element={
-                    <>
-                      <Menu title={'Món Á'}/>
-                      <Menu title={'Món Âu'}/>
-                      <Menu title={"Rau Xanh"}/>
-                      <Menu title={"Đồ uống"}/>
-                      <Menu title={"Đồ nướng"}/>
-                    </>
-                  }
-                />
-                <Route path="/ContactPage" element={<ContactPage/>} />
-                <Route path="/banner" element={<Banner />} />
-                <Route path="/profile" element={<ProfilePage />} /> {/* Thêm route Profile */}
-              </Route>
+        {/* Trang Banner riêng */}
+        <Route
+          path="/banner"
+          element={
+            <>
+              <Header />
+              <Banner />
+            </>
+          }
+        />
+
+        {/* Trang đăng nhập */}
+        <Route
+          path="/login"
+          element={
+            <>
+              <Header />
+              <Login />
               
-              {/* Nhóm 3: Các trang USER (dùng AuthLayout) */}
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/cart" element={<CartPage />} />
-              </Route>
+            </>
+          }
+        />
+
+        {/* Trang đăng ký */}
+        <Route
+          path="/signup"
+          element={
+            <>
+              <Header />
+              <Signup />
+            </>
+          }
+        />
+        <Route
+          path="/menu"
+          element={
+            <>
+              <Header/>
+              <Menu title={'Món Á'}/>
+              <Menu title={'Món Âu'}/>
+              <Menu title={"Rau Xanh"}/>
+              <Menu title={"Đồ uống"}/>
+              <Menu title={"Đồ nướng"}/>
               
-            </Routes>
-          </Suspense>
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+            </>
+          }
+        
+        
+        />
+        <Route 
+          path="/cart"
+          element={
+            <>
+              <Header/>
+              <CartPage/>
+              
+            </>
+            }
+            
+        />
+        <Route 
+          path="/ContactPage"
+          element={
+            <>
+              <Header />
+              <ContactPage/>
+              <Footer/>
+            </>
+            }
+            
+        />
+        
+       
+        
+      </Routes>
+    </Router>
   );
 }
 
