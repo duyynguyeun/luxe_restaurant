@@ -21,6 +21,7 @@ const Signup = lazy(() => import('./dndx/Signup'));
 const ContactPage = lazy(() => import('./Lienhe/ContactPage'));
 // Chúng ta vẫn cần lazy load trang Profile
 const ProfilePage = lazy(() => import('./dndx/ProfilePage')); 
+import Chatbot from "./Chatbot/Chatbot";
 
 // 5. LAZY LOAD CÁC TRANG ADMIN
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
@@ -127,7 +128,9 @@ function App() {
                 } 
               />
               
+              
             </Routes>
+            <Chatbot/>
           </Suspense>
         </Router>
       </CartProvider>
