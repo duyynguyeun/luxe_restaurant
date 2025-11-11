@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class BaseEnity {
 
     @CreationTimestamp
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP(0) WITHOUT TIME ZONE")
+    @Column(name = "created_at", columnDefinition = "DATETIME")
     private LocalDateTime createdAt;
 
     @CreatedBy

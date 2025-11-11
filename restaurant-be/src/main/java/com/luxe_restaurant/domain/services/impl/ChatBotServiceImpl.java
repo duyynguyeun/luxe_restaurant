@@ -1,7 +1,7 @@
-package com.luxe_restaurant.domain.service.impl;
+package com.luxe_restaurant.domain.services.impl;
 
-import com.luxe_restaurant.domain.dto.ChatBotRequest;
-import com.luxe_restaurant.domain.service.ChatBotService;
+import com.luxe_restaurant.app.requests.ChatBotRequest;
+import com.luxe_restaurant.domain.services.ChatBotService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 

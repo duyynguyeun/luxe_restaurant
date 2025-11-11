@@ -1,4 +1,4 @@
-package com.luxe_restaurant.domain.dto;
+package com.luxe_restaurant.app.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
