@@ -1,5 +1,6 @@
 package com.luxe_restaurant.app.responses.users;
 
+import com.luxe_restaurant.domain.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,6 @@ public class UserCreateResponse {
     private String phone;
 
     private String email;
+
+    private Role role;
 }

@@ -23,6 +23,7 @@ public class jwtService {
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
+                .claim("role", user.getRole().name())
                 .issueTime(issueTime)
                 .expirationTime(experedTime)
                 .build();
@@ -46,6 +47,7 @@ public class jwtService {
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
+                .claim("role", user.getRole().name())
                 .issueTime(issueTime)
                 .expirationTime(experedTime)
                 .build();
