@@ -28,7 +28,6 @@ public class AuthenticationService {
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .userName(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole().name())
                 .build();

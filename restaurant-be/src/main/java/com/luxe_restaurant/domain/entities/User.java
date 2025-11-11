@@ -40,18 +40,18 @@ public class User extends BaseEnity implements UserDetails {
     @Column
     private Role role;
 
-    @Override
-    public String getUsername() { return this.email; }
+//    @Override
+//    public String getUsername() { return this.email; }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
 
-//    @Override
-//    public String getUsername() {
-//        return "";
-//    }
+    @Override
+    public String getUsername() {
+        return "";
+    }
 
     @Override
     public boolean isAccountNonExpired() {
