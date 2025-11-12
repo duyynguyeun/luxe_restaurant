@@ -37,7 +37,9 @@ public class SecurityConfig {
             "/swagger-resources/**",
             "/api/chatbot",
             "/api/login",
-            "/api/user/create"
+            "/api/user/create",
+            "/api/dish/**",
+            "/api/dish/update/**",
     };
 
     @Bean

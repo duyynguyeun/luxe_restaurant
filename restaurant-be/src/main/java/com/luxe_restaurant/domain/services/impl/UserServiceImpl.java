@@ -6,17 +6,15 @@ import com.luxe_restaurant.domain.entities.User;
 import com.luxe_restaurant.domain.enums.Role;
 import com.luxe_restaurant.domain.repositories.UserRepository;
 import com.luxe_restaurant.domain.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-
-    public UserServiceImpl (UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     public UserCreateResponse createUser(UserCreateRequest request) {
         if(userRepository.existsByEmail(request.getEmail())) {
