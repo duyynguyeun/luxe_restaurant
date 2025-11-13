@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 public interface DishService {
-    public DishResponse createDish(@RequestBody DishRequest dishRequest);
+    DishResponse createDish(@RequestBody DishRequest dishRequest);
     List<DishResponse> getAllDishes();
-    public DishResponse updateDish(@PathVariable Long id, @RequestBody DishRequest dishRequest);
+    DishResponse updateDish(@PathVariable Long id, @RequestBody DishRequest dishRequest);
+    void deleteDish(@PathVariable Long id);
+    DishResponse getDishById(@PathVariable Long id);
 }

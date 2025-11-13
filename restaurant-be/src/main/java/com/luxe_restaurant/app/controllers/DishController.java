@@ -29,4 +29,14 @@ public class DishController {
     public DishResponse updateDish(@PathVariable Long id, @RequestBody DishRequest dishRequest){
         return dishService.updateDish(id, dishRequest);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteDish(@PathVariable Long id){
+        dishService.deleteDish(id);
+    }
+
+    @GetMapping("/find/{id}")
+    public DishResponse findDish(@PathVariable Long id){
+        return dishService.getDishById(id);
+    }
 }

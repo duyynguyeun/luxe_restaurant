@@ -22,7 +22,7 @@ public class jwtService {
         Date experedTime = Date.from(issueTime.toInstant().plus(30, ChronoUnit.MINUTES));
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
+                .subject(user.getUserName())
                 .claim("role", user.getRole().name())
                 .issueTime(issueTime)
                 .expirationTime(experedTime)
@@ -46,7 +46,7 @@ public class jwtService {
         Date experedTime = Date.from(issueTime.toInstant().plus(30, ChronoUnit.DAYS));
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
+                .subject(user.getUserName())
                 .claim("role", user.getRole().name())
                 .issueTime(issueTime)
                 .expirationTime(experedTime)

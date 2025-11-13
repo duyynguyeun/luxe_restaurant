@@ -45,6 +45,7 @@ public class DishServiceImpl implements DishService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public DishResponse updateDish(Long id, DishRequest dishRequest){
         Dish dish = dishRepository.findById(id).orElseThrow(()-> new RuntimeException("Dish Not Found"));
         Category category = categoryRepository.findById(id).orElseThrow(()-> new RuntimeException("Category Not Found"));
@@ -59,4 +60,15 @@ public class DishServiceImpl implements DishService {
         return   modelMapper.map(update,DishResponse.class);
     }
 
+    @Override
+    public void deleteDish(Long id){
+        Dish dish = dishRepository.findById(id).orElseThrow(()-> new RuntimeException("Dish Not Found"));
+        dishRepository.delete(dish);
+    }
+
+    @Override
+    public DishResponse getDishById(Long id){
+        Dish dish = dishRepository.findById(id).orElseThrow(()-> new RuntimeException("Dish Not Found"));
+        return modelMapper.map(dish, DishResponse.class);
+    }
 }
