@@ -3,18 +3,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // 1. Import hook của chúng ta
 
 const Login = () => {
-  const [username, setUsername] = useState(''); // Đổi email thành username
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth(); // 2. Lấy hàm login "giả"
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     // 3. Gọi hàm login "giả"
-    const success = login(username, password);
+    const success = await login(email, password);
 
     if (success) {
       navigate('/'); // Thành công, về trang chủ
@@ -32,13 +32,13 @@ const Login = () => {
         
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Tên đăng nhập</label>
+            <label className="block text-gray-700 mb-2">Email</label>
             <input
-              type="text"
-              placeholder="Nhập 'admin'"
+              type="email"
+              placeholder="Nhập email của bạn..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>

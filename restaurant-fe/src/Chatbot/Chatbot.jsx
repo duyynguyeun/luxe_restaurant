@@ -25,7 +25,7 @@ const Chatbot = () => {
       // TÔI GIẢ SỬ class ChatBotRequest của bạn có dạng { "message": "..." }
       // HÃY SỬA LẠI NẾU TÊN TRƯỜNG KHÁC (ví dụ: "prompt", "text"...)
       const requestBody = {
-        message: newMessage 
+        question: newMessage 
       };
 
       // 3. GỌI API BẰNG FETCH (Phương thức POST)
