@@ -19,7 +19,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Builder
-public class User extends BaseEnity{
+public class User  extends BaseEnity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

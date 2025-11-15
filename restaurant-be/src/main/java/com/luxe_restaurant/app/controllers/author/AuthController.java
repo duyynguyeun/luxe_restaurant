@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin; // <-- 1. THÊM DÒNG NÀY
+
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"}) // <-- 2. THÊM DÒNG NÀY
 
 @RestController
 @RequiredArgsConstructor

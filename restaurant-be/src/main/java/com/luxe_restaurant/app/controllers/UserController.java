@@ -1,14 +1,17 @@
 package com.luxe_restaurant.app.controllers;
 
+
 import com.luxe_restaurant.app.requests.users.UserCreateRequest;
 import com.luxe_restaurant.app.responses.users.UserCreateResponse;
 import com.luxe_restaurant.app.responses.users.UserResponse;
 import com.luxe_restaurant.domain.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
