@@ -20,8 +20,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // 2. Hàm Đăng nhập "Giả"
-  // Tài khoản test: admin / 123
   const login = async (email, password) => {
     try {
       // Gọi API đến backend (sử dụng biến .env)

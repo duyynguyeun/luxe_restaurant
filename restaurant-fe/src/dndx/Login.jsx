@@ -19,7 +19,7 @@ const Login = () => {
     if (success) {
       navigate('/'); // Thành công, về trang chủ
     } else {
-      setError('Tên đăng nhập hoặc mật khẩu không đúng. (Thử: admin / 123)');
+      setError('Tên đăng nhập hoặc mật khẩu không đúng.');
     }
   };
 
