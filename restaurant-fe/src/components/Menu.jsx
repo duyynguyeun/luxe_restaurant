@@ -1,165 +1,178 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { CartContext } from "../giohang/CartContext";
-import imgberger from "../assets/hamberger.webp";
-import imgganuong from "../assets/ganuong.jpg";
-import pho from "../assets/pho.jpg";
-import banhmi from "../assets/banhmi.jpg";
+import { FaShoppingCart, FaSearch } from "react-icons/fa";
 
-// 1. Tối ưu: Đưa danh sách món ăn ra ngoài component
-// Thêm ID duy nhất cho mỗi món (Rất quan trọng)
-const menuData = [
-  {
-    id: "hbg001",
-    ten: "Hamburger",
-    gia: 150000,
-    mota: "Món burger đặc biệt với thịt bò, rau tươi và sốt bí mật.",
-    img: imgberger,
-  },
-  {
-    id: "gan002",
-    ten: "Gà nướng",
-    gia: 300000,
-    mota: "Gà nướng lu thơm ngon, da giòn, thịt mềm.",
-    img: imgganuong,
-  },
-  {
-    id: "pho003",
-    ten: "Phở",
-    gia: 200000,
-    mota: "Phở bò",
-    img: pho,
-  },
-  {
-    id: "bami004",
-    ten: "Bánh mì",
-    gia: 250000,
-    mota: "Bánh mì Việt Nam",
-    img: banhmi,
-  },
-];
-
-const Menu = ({ title }) => {
-  const [openform, setopenform] = useState(null);
+const Menu = () => {
   const { addToCart } = useContext(CartContext);
-
-  // 2. Thêm State cho thanh tìm kiếm
+  
+  const [groupedMenu, setGroupedMenu] = useState({}); 
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all"); // Để highlight menu
 
-  // 3. Lọc danh sách món ăn dựa trên thanh tìm kiếm
-  const filteredDanhSach = menuData.filter((mon) =>
-    mon.ten.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchDishes = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dish/getall`);
+        const data = await response.json();
 
-  // Hàm xử lý chung để thêm vào giỏ hàng (để tránh lặp code)
-  const handleAddToCart = (mon) => {
-    addToCart(mon);
-    // Bạn có thể dùng toast notification ở đây thay vì alert
-    // alert("Đã thêm vào giỏ hàng!!!");
+        // 1. Lọc món đang BẬT
+        const activeDishes = data.filter(item => item.active === true);
+        
+        // 2. Lọc theo tìm kiếm
+        const filteredDishes = activeDishes.filter(item => 
+             item.nameDish.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        // 3. Gom nhóm theo Danh mục
+        const groups = {};
+        filteredDishes.forEach(dish => {
+            const catName = dish.categoryName || "Khác"; 
+            if (!groups[catName]) {
+                groups[catName] = [];
+            }
+            groups[catName].push(dish);
+        });
+
+        setGroupedMenu(groups);
+      } catch (error) {
+        console.error("Lỗi tải menu:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDishes();
+  }, [searchTerm]);
+
+  const handleAddToCart = (item) => {
+    addToCart({
+        id: item.id,
+        ten: item.nameDish,
+        gia: item.price,
+        img: item.urlImage
+    });
+    // alert("Đã thêm vào giỏ!");
   };
 
-  return (
-    // 4. Thiết kế lại container chính
-    <div className="px-4 sm:px-8 lg:px-16 py-12 bg-gray-100">
-      
-      {/* Tiêu đề chính */}
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">{title}</h2>
+  const scrollToCategory = (catName) => {
+    const element = document.getElementById(catName);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      setActiveCategory(catName);
+    }
+  };
 
-      {/* 5. Thanh tìm kiếm */}
-      <div className="max-w-lg mx-auto mb-10">
-        <input
-          type="text"
-          placeholder={`Tìm trong ${title}...`}
-          className="w-full px-5 py-3 text-base border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 transition"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#174C34]"></div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-20 font-sans">
+      
+      {/* --- BANNER --- */}
+      <div className="relative h-[300px] bg-cover bg-center flex flex-col items-center justify-center text-white"
+           style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop')" }}>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 uppercase tracking-wider drop-shadow-lg">
+          Thực Đơn Hảo Hạng
+        </h1>
+        <div className="relative w-full max-w-lg px-4">
+            <input 
+              type="text" 
+              placeholder="Bạn muốn tìm món gì?..." 
+              className="w-full py-3 pl-5 pr-12 rounded-full text-gray-800 focus:outline-none shadow-xl"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <FaSearch className="absolute right-8 top-3.5 text-gray-400 text-xl" />
+        </div>
       </div>
 
-      {/* 6. Thiết kế lại lưới sản phẩm (dùng Grid) */}
-      {filteredDanhSach.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredDanhSach.map((mon) => (
-            // 7. Thiết kế lại Thẻ (Card) món ăn
-            <div
-              key={mon.id} // Dùng ID làm key
-              className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
-            >
-              {/* Ảnh món ăn */}
-              <img
-                src={mon.img}
-                alt={mon.ten}
-                onClick={() => setopenform(mon)}
-                className="w-full h-56 object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
-              />
-
-              {/* Thân thẻ (tên, giá, nút) */}
-              <div className="p-5 flex flex-col justify-between flex-grow">
-                {/* Tên và giá */}
-                <div>
-                  <h3 className="font-bold text-xl mb-1 text-gray-800">{mon.ten}</h3>
-                  <p className="font-semibold text-lg text-green-600 mb-4">
-                    {mon.gia.toLocaleString()}₫
-                  </p>
-                </div>
-                {/* Nút đặt hàng */}
-                <button
-                  className="w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors"
-                  onClick={() => handleAddToCart(mon)}
-                >
-                  Thêm vào giỏ
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        // 8. Thông báo khi không tìm thấy kết quả
-        <div className="text-center py-10">
-          <p className="text-lg text-gray-600">
-            Không tìm thấy món ăn nào phù hợp với từ khóa "{searchTerm}".
-          </p>
-        </div>
-      )}
-
-      {/* Modal mô tả (Giữ nguyên logic, chỉnh lại nút) */}
-      {openform && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={() => setopenform(null)}
-        >
-          <div
-            className="bg-white p-6 rounded-xl w-full max-w-md text-center relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="absolute top-3 right-3 text-2xl text-gray-400 hover:text-black"
-              onClick={() => setopenform(null)}
-            >
-              &times;
-            </button>
-
-            <h2 className="text-2xl font-bold mb-4">{openform.ten}</h2>
-            <img
-              src={openform.img}
-              alt={openform.ten}
-              className="rounded-xl w-full h-56 object-cover mb-4 shadow-md"
-            />
-            <p className="text-gray-700 text-base mb-4">{openform.mota}</p>
-            <p className="mt-3 font-semibold text-2xl text-green-600 mb-5">
-              {openform.gia.toLocaleString()}₫
-            </p>
-            <button
-              className="w-full bg-yellow-500 text-white font-bold py-3 px-5 rounded-lg hover:bg-yellow-600 transition-colors"
-              onClick={() => {
-                handleAddToCart(openform);
-                setopenform(null); // Đóng modal sau khi thêm
-              }}
-            >
-              Thêm vào giỏ
-            </button>
+      {/* --- THANH MENU DANH MỤC (STICKY) --- */}
+      <div className="sticky top-[70px] z-30 bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-hide">
+          <div className="flex space-x-6 py-4 whitespace-nowrap">
+            {Object.keys(groupedMenu).map((cat) => (
+              <button
+                key={cat}
+                onClick={() => scrollToCategory(cat)}
+                className={`text-sm font-bold uppercase tracking-wide transition-colors ${
+                  activeCategory === cat 
+                    ? "text-[#174C34] border-b-2 border-[#174C34]" 
+                    : "text-gray-500 hover:text-[#174C34]"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
-      )}
+      </div>
+
+      {/* --- DANH SÁCH MÓN ĂN --- */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        {Object.keys(groupedMenu).length === 0 ? (
+            <div className="text-center py-20 text-gray-500 text-lg">Không tìm thấy món ăn nào.</div>
+        ) : (
+            Object.keys(groupedMenu).map((categoryName) => (
+                <div key={categoryName} id={categoryName} className="mb-16 scroll-mt-32">
+                    {/* Tiêu đề nhóm */}
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span className="w-2 h-8 bg-yellow-500 mr-3 rounded-full"></span>
+                        {categoryName}
+                    </h2>
+
+                    {/* Grid Món ăn */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {groupedMenu[categoryName].map((mon) => (
+                            <div key={mon.id} className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100">
+                                {/* Ảnh */}
+                                <div className="relative h-48 overflow-hidden">
+                                    <img 
+                                        src={mon.urlImage || "https://via.placeholder.com/300"} 
+                                        alt={mon.nameDish} 
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    />
+                                    {/* Nút thêm nhanh */}
+                                    <button 
+                                        onClick={() => handleAddToCart(mon)}
+                                        className="absolute bottom-3 right-3 bg-white text-[#174C34] p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-[#174C34] hover:text-white"
+                                        title="Thêm vào giỏ"
+                                    >
+                                        <FaShoppingCart />
+                                    </button>
+                                </div>
+                                
+                                {/* Thông tin */}
+                                <div className="p-5">
+                                    <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-1 group-hover:text-[#174C34] transition-colors">
+                                        {mon.nameDish}
+                                    </h3>
+                                    <div className="flex justify-between items-end mt-4 border-t pt-3 border-gray-100">
+                                        <div>
+                                            <p className="text-xs text-gray-400 font-semibold uppercase">Giá</p>
+                                            <span className="text-xl font-extrabold text-yellow-600">
+                                                {mon.price?.toLocaleString()}₫
+                                            </span>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleAddToCart(mon)}
+                                            className="text-sm font-semibold text-[#174C34] hover:underline"
+                                        >
+                                            Chi tiết
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))
+        )}
+      </div>
     </div>
   );
 };

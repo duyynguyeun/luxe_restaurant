@@ -1,5 +1,6 @@
 package com.luxe_restaurant.domain.services.jwt;
 
+import com.luxe_restaurant.domain.entities.CustomUserDetail; // <-- 1. THÊM IMPORT NÀY
 import com.luxe_restaurant.app.requests.LoginRequest;
 import com.luxe_restaurant.app.responses.LoginResponse;
 import com.luxe_restaurant.domain.entities.User;
@@ -20,7 +21,9 @@ public class AuthenticationService {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-        User user = (User) authentication.getPrincipal();
+        // User user = (User) authentication.getPrincipal();
+        CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+        User user = customUserDetail.getUser();
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);

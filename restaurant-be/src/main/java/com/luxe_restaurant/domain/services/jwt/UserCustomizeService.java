@@ -1,5 +1,6 @@
 package com.luxe_restaurant.domain.services.jwt;
-
+import com.luxe_restaurant.domain.entities.CustomUserDetail; // <-- 1. THÊM IMPORT NÀY
+import com.luxe_restaurant.domain.entities.User; // <-- 2. THÊM IMPORT NÀY
 import com.luxe_restaurant.domain.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,8 +16,10 @@ public class UserCustomizeService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User does not exist"));
-    }
+    User user = userRepository.findByEmail(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User does not exist"));
+
+    return new CustomUserDetail(user); // <-- Phải trả về đối tượng này
+}
 
 }
