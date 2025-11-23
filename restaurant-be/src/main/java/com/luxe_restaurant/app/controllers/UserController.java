@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
+// Dev FE thêm
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
+
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor

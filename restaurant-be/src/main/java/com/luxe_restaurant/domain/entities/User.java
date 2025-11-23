@@ -5,11 +5,8 @@ import com.luxe_restaurant.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Data
 @Table(name = "user_accounts")
@@ -19,7 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Builder
-public class User  extends BaseEnity {
+public class User extends BaseEnity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,6 +29,9 @@ public class User  extends BaseEnity {
 
     @Column
     private String phone;
+
+    @Column
+    private BigDecimal point;
 
     @JsonIgnore
     private String password;
