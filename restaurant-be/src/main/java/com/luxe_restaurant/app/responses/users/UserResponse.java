@@ -14,4 +14,5 @@ public class UserResponse {
     private String phone;
     // --- THÊM DÒNG NÀY ---
     private String role;
+    private String password;
 }

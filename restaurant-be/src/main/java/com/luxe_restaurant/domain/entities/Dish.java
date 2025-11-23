@@ -22,6 +22,9 @@ public class Dish {
     @Column
     private BigDecimal price;
 
+    @Column
+    private String des;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

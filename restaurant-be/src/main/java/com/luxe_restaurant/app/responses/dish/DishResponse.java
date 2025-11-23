@@ -17,6 +17,7 @@ public class DishResponse {
     private String urlImage;
     private BigDecimal price;
     private String categoryName;
+    private String des;
     // --- QUAN TRỌNG: DÒNG NÀY GIÚP LƯU TRẠNG THÁI ---
     private boolean active;
     

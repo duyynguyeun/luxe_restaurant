@@ -46,6 +46,7 @@ public class DishServiceImpl implements DishService {
         Dish dish = modelMapper.map(dishRequest, Dish.class);
         dish.setId(null);
         dish.setCategory(category);
+        dish.setDes(dishRequest.getDes());
         dish.setActive(true); // Món mới mặc định là BẬT
 
         Dish saveDish = dishRepository.save(dish);
@@ -74,6 +75,7 @@ public class DishServiceImpl implements DishService {
         dish.setPrice(dishRequest.getPrice());
         dish.setCategory(category);
         dish.setUrlImage(dishRequest.getUrlImage());
+        dish.setDes(dishRequest.getDes());
 
         Dish update = dishRepository.save(dish);
         return mapToResponse(update);
