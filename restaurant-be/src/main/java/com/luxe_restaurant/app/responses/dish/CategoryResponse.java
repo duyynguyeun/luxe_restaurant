@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryResponse {
-    private String id;
-    private String categoryName;
+    private Long id;      // Đã đổi thành Long cho khớp với Database
+    private String name;  
 }

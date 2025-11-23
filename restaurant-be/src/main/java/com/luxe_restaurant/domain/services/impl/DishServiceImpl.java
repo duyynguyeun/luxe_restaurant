@@ -22,27 +22,26 @@ public class DishServiceImpl implements DishService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
-    // 1. Hàm map dữ liệu an toàn (Tránh lỗi 500 khi danh mục bị null)
+    // Hàm map dữ liệu an toàn
     private DishResponse mapToResponse(Dish dish) {
         DishResponse response = modelMapper.map(dish, DishResponse.class);
         if (dish.getCategory() != null) {
             response.setCategoryName(dish.getCategory().getName());
-            // --- THÊM DÒNG NÀY ĐỂ SỬA LỖI NHẢY LOẠI ---
             response.setCategoryId(dish.getCategory().getId());
-
         } else {
             response.setCategoryName("Chưa phân loại");
         }
-        // --- THÊM DÒNG NÀY CHO CHẮC CHẮN ---
-        response.setActive(dish.isActive()); 
-        // -----------------------------------
+        response.setActive(dish.isActive());
         return response;
     }
 
     @Override
     public DishResponse createDish(DishRequest dishRequest) {
-        Category category = categoryRepository.findById(dishRequest.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category Not Found"));
+        // Tìm danh mục, nếu không thấy thì để null (không báo lỗi 500)
+        Category category = null;
+        if (dishRequest.getCategoryId() != null) {
+            category = categoryRepository.findById(dishRequest.getCategoryId()).orElse(null);
+        }
 
         Dish dish = modelMapper.map(dishRequest, Dish.class);
         dish.setId(null);
@@ -66,9 +65,10 @@ public class DishServiceImpl implements DishService {
         Dish dish = dishRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dish Not Found"));
 
-        // Tìm Category theo ID gửi lên
-        Category category = categoryRepository.findById(dishRequest.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category Not Found"));
+        Category category = null;
+        if (dishRequest.getCategoryId() != null) {
+            category = categoryRepository.findById(dishRequest.getCategoryId()).orElse(null);
+        }
 
         dish.setNameDish(dishRequest.getDishName());
         dish.setPrice(dishRequest.getPrice());
@@ -93,14 +93,11 @@ public class DishServiceImpl implements DishService {
         return mapToResponse(dish);
     }
 
-    // 2. Hàm xử lý Bật/Tắt (Logic chuẩn)
     @Override
     public DishResponse toggleDishStatus(Long id) {
         Dish dish = dishRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dish Not Found"));
-
-        dish.setActive(!dish.isActive()); // Đảo ngược trạng thái
-        
+        dish.setActive(!dish.isActive()); 
         Dish updatedDish = dishRepository.save(dish);
         return mapToResponse(updatedDish);
     }

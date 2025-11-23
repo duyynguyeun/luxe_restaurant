@@ -29,6 +29,7 @@ public class AuthenticationService {
         String refreshToken = jwtService.generateRefreshToken(user);
 
         return LoginResponse.builder()
+                .id(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .email(user.getEmail())

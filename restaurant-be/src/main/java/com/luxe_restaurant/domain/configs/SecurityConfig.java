@@ -46,6 +46,10 @@ public class SecurityConfig {
             "/api/user/delete/**",
             "/api/dish/find/**",
             "/api/user/find/**",
+            // THÊM DÒNG NÀY VÀO:
+            "/api/dish/toggle/**",
+            "/api/category/**", // <--- THÊM DÒNG NÀY QUAN TRỌNG cho phan danh muc mon
+            "/api/orders/**", // <--- Thêm dòng này cho phan order
     };
 
     @Bean

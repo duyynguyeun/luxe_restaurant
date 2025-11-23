@@ -12,4 +12,6 @@ public class UserResponse {
     private String userName;
     private String email;
     private String phone;
+    // --- THÊM DÒNG NÀY ---
+    private String role;
 }
