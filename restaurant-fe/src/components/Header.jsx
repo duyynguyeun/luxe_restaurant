@@ -30,7 +30,8 @@ const Header = () => {
             <li>
               <Link to="/cart" className="hover:text-yellow-300">🛒 Giỏ hàng</Link>
             </li>
-
+            <Link to="/my-orders" className="hover:text-yellow-300">Đơn hàng của tôi</Link>
+               
             {/* 3. PHẦN QUAN TRỌNG: KIỂM TRA ĐĂNG NHẬP */}
             {currentUser ? (
               // Nếu ĐÃ đăng nhập

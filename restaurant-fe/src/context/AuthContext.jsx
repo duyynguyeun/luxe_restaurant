@@ -10,15 +10,13 @@ export const useAuth = () => {
 
 // Tạo Provider
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // 1. Kiểm tra localStorage khi app mới tải
-  useEffect(() => {
+  // SỬA ĐỔI: Khởi tạo state trực tiếp từ localStorage để có dữ liệu ngay lập tức
+  const [currentUser, setCurrentUser] = useState(() => {
     const storedUser = localStorage.getItem('fakeUser');
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-    }
-  }, []);
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  // Không cần useEffect để load lại user nữa vì đã làm ở trên
 
   const login = async (email, password) => {
     try {
@@ -42,9 +40,10 @@ export const AuthProvider = ({ children }) => {
 
       // Tạo đối tượng user để lưu vào state và localStorage
       const userToStore = {
+        id: data.id,
         username: data.email, // Tạm dùng email làm username hiển thị
         email: data.email,
-        role: data.role,
+        role: data.role, // Role quan trọng để phân quyền (ADMIN/CUSTOMER)
         token: data.accessToken, // !! Quan trọng: Lưu lại token
       };
       
@@ -58,13 +57,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 3. Hàm Đăng xuất
+  // Hàm Đăng xuất
   const logout = () => {
     localStorage.removeItem('fakeUser');
     setCurrentUser(null);
   };
 
-  // 4. Hàm "Giả" cập nhật profile
+  // Hàm cập nhật profile
   const updateProfile = (newUsername) => {
     if (currentUser) {
       const updatedUser = { ...currentUser, username: newUsername };
@@ -83,4 +82,3 @@ export const AuthProvider = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
