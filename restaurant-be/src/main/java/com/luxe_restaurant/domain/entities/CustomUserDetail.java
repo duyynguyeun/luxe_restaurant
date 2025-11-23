@@ -11,6 +11,11 @@ import java.util.List;
 public class CustomUserDetail implements UserDetails {
 
     private final User user;
+    
+    // THÊM PHƯƠNG THỨC NÀY ĐỂ LẤY USER GỐC:
+    public User getUser() {
+        return user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -24,7 +29,7 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUserName();
+        return user.getEmail(); // <-- Phải trả về email, vì bạn đăng nhập bằng email
     }
 
     @Override

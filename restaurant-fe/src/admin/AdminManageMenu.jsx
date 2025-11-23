@@ -1,85 +1,236 @@
-import React, { useState } from 'react';
-
-// Dữ liệu giả (sau này sẽ lấy từ database)
-const mockMenuData = [
-  { id: "hbg001", ten: "Hamburger", gia: 150000 },
-  { id: "gan002", ten: "Gà nướng", gia: 300000 },
-  { id: "pho003", ten: "Phở", gia: 200000 },
-  { id: "bami004", ten: "Bánh mì", gia: 250000 },
-];
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext'; 
+import { FaDollarSign, FaTag, FaImage, FaTimes, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaList } from 'react-icons/fa';
 
 const AdminManageMenu = () => {
-  const [menuItems, setMenuItems] = useState(mockMenuData);
+  const [menuItems, setMenuItems] = useState([]);
+  const [categories, setCategories] = useState([]); // State lưu danh mục
+  const { currentUser } = useAuth(); 
 
-  const handleAdd = () => {
-    // Logic để mở modal/form thêm món ăn
-    alert('Mở form thêm món ăn...');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); 
+  const [currentDishId, setCurrentDishId] = useState(null);
+
+  const [formData, setFormData] = useState({
+    dishName: '',
+    price: '',
+    urlImage: '',
+    categoryId: '' // ID danh mục
+  });
+
+  // --- Tải dữ liệu ---
+  const fetchData = async () => {
+    try {
+      const [dishRes, catRes] = await Promise.all([
+        fetch(`${import.meta.env.VITE_API_URL}/api/dish/getall`),
+        fetch(`${import.meta.env.VITE_API_URL}/api/category/getall`)
+      ]);
+
+      if (dishRes.ok) setMenuItems((await dishRes.json()).reverse());
+      if (catRes.ok) setCategories(await catRes.json());
+    } catch (error) {
+      console.error("Lỗi kết nối:", error);
+    }
   };
 
-  const handleEdit = (id) => {
-    // Logic để mở modal/form sửa món ăn
-    alert(`Mở form sửa món ăn ID: ${id}`);
+  useEffect(() => { fetchData(); }, []); 
+
+  const handleToggle = async (id) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dish/toggle/${id}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${currentUser.token}` }
+      });
+      if (response.ok) {
+        setMenuItems(prev => prev.map(item => item.id === id ? { ...item, active: !item.active } : item));
+      }
+    } catch (error) { console.error(error); }
   };
 
-  const handleDelete = (id) => {
-    // Logic để xóa món ăn (sau này gọi API)
-    if (window.confirm('Bạn có chắc muốn xóa món này?')) {
-      setMenuItems(prev => prev.filter(item => item.id !== id));
-      alert(`Đã xóa (giả) món ăn ID: ${id}`);
+  const handleDelete = async (id) => {
+    if (window.confirm('Xóa món này?')) {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dish/delete/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (response.ok) fetchData();
+      } catch (error) { console.error(error); }
+    }
+  };
+
+  // --- Mở Modal ---
+  const openAddModal = () => {
+    setIsEditing(false);
+    setFormData({ 
+        dishName: '', price: '', urlImage: '', 
+        // Mặc định chọn ID đầu tiên nếu có danh mục
+        categoryId: categories.length > 0 ? categories[0].id : '' 
+    }); 
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (dish) => {
+    setIsEditing(true); 
+    setCurrentDishId(dish.id);
+    setFormData({
+      dishName: dish.nameDish,
+      price: dish.price,
+      urlImage: dish.urlImage,
+      categoryId: dish.categoryId || (categories.length > 0 ? categories[0].id : '')
+    });
+    setIsModalOpen(true);
+  };
+
+  // --- Submit Form ---
+  const handleFormSubmit = async (e) => {
+    e.preventDefault(); 
+    setIsLoading(true);
+
+    const payload = {
+      dishName: formData.dishName,
+      price: parseFloat(formData.price),
+      urlImage: formData.urlImage,
+      categoryId: formData.categoryId,
+    };
+
+    try {
+      let url = isEditing 
+        ? `${import.meta.env.VITE_API_URL}/api/dish/update/${currentDishId}`
+        : `${import.meta.env.VITE_API_URL}/api/dish/create`;
+      let method = isEditing ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser.token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        alert(isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!');
+        setIsModalOpen(false);
+        fetchData();
+      } else {
+        alert('Lỗi! Mã: ' + response.status);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Lỗi kết nối server.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">Quản lý Món ăn</h2>
-        <button
-          onClick={handleAdd}
-          className="bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600 transition-colors"
-        >
-          + Thêm món
+        <h2 className="text-3xl font-bold text-gray-800">Quản lý Menu</h2>
+        <button onClick={openAddModal} className="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 shadow-md flex items-center gap-2">
+          <span>+</span> Thêm món
         </button>
       </div>
 
-      {/* Bảng hiển thị Món ăn */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 border">
-          <thead className="bg-gray-100">
+        <table className="min-w-full divide-y divide-gray-200 border rounded-lg">
+          <thead className="bg-gray-800 text-white">
             <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase">ID</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase">Tên Món</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase">Giá</th>
-              <th className="px-6 py-3 text-center text-sm font-semibold text-gray-600 uppercase">Hành động</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Ảnh</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Tên</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Danh mục</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold uppercase">Giá</th>
+              <th className="px-6 py-3 text-center text-sm font-semibold uppercase">TT</th>
+              <th className="px-6 py-3 text-center text-sm font-semibold uppercase">Hành động</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {menuItems.map((item) => (
               <tr key={item.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-gray-700">{item.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.ten}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-green-600 font-semibold">
-                  {item.gia.toLocaleString()}₫
+                <td className="px-6 py-4"><img src={item.urlImage} className="h-12 w-12 rounded-full object-cover border" /></td>
+                <td className="px-6 py-4 font-medium">{item.nameDish}</td>
+                <td className="px-6 py-4 text-gray-600">{item.categoryName || '---'}</td>
+                <td className="px-6 py-4 text-green-600 font-bold">{item.price?.toLocaleString()}₫</td>
+                <td className="px-6 py-4 text-center">
+                  <button onClick={() => handleToggle(item.id)} className={`px-3 py-1 rounded-full text-xs font-bold ${item.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {item.active ? 'Hiện' : 'Ẩn'}
+                  </button>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
-                  <button
-                    onClick={() => handleEdit(item.id)}
-                    className="text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    Sửa
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="text-red-600 hover:text-red-800 font-medium"
-                  >
-                    Xóa
-                  </button>
+                <td className="px-6 py-4 text-center flex justify-center gap-3">
+                  <button onClick={() => openEditModal(item)} className="text-blue-500"><FaEdit /></button>
+                  <button onClick={() => handleDelete(item.id)} className="text-red-500"><FaTrash /></button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg">
+            <div className="flex justify-between items-center mb-6 border-b pb-4">
+              <h2 className="text-2xl font-bold">{isEditing ? 'Cập nhật' : 'Thêm Món'}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-red-500"><FaTimes size={24} /></button>
+            </div>
+            
+            <form onSubmit={handleFormSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-semibold mb-1">Tên Món</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><FaTag className="text-gray-400"/></div>
+                  <input type="text" value={formData.dishName} onChange={(e) => setFormData({...formData, dishName: e.target.value})} className="pl-10 block w-full px-4 py-3 border rounded-lg" required />
+                </div>
+              </div>
+
+              {/* Ô CHỌN DANH MỤC */}
+              <div>
+                <label className="block text-sm font-semibold mb-1">Danh mục</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><FaList className="text-gray-400"/></div>
+                  <select 
+                    value={formData.categoryId} 
+                    onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
+                    className="pl-10 block w-full px-4 py-3 border rounded-lg bg-white appearance-none cursor-pointer"
+                    required
+                  >
+                    <option value="" disabled>-- Chọn danh mục --</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-1">Giá (VNĐ)</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><FaDollarSign className="text-gray-400"/></div>
+                  <input type="number" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} className="pl-10 block w-full px-4 py-3 border rounded-lg" required />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-1">Link Ảnh</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><FaImage className="text-gray-400"/></div>
+                  <input type="text" value={formData.urlImage} onChange={(e) => setFormData({...formData, urlImage: e.target.value})} className="pl-10 block w-full px-4 py-3 border rounded-lg" required />
+                </div>
+              </div>
+
+              <div className="mt-8 flex gap-3 pt-4">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-gray-100 font-bold py-3 rounded-xl">Hủy</button>
+                <button type="submit" className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg" disabled={isLoading}>
+                  {isLoading ? '...' : 'Lưu'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div> 
   );
 };
 

@@ -11,6 +11,13 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import LoadingSpinner from "./Loading/LoadingSpinner"; // Đường dẫn file loading
 
+// --- THÊM IMPORT NÀY ---
+import AdminRoute from "./components/AdminRoute";
+// -----------------------
+// --- 1. IMPORT TOASTIFY VÀ CSS ---
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// --------------------------------
 // 4. "LAZY LOAD" CÁC COMPONENT
 const Banner = lazy(() => import('./components/Banner'));
 const FeaturedMenu = lazy(() => import('./components/FeaturedMenu'));
@@ -19,6 +26,7 @@ const CartPage = lazy(() => import('./giohang/CartPage'));
 const Login = lazy(() => import('./dndx/Login'));
 const Signup = lazy(() => import('./dndx/Signup'));
 const ContactPage = lazy(() => import('./Lienhe/ContactPage'));
+const MyOrders = lazy(() => import('./giohang/MyOrders'));
 // Chúng ta vẫn cần lazy load trang Profile
 const ProfilePage = lazy(() => import('./dndx/ProfilePage')); 
 import Chatbot from "./Chatbot/Chatbot";
@@ -27,6 +35,9 @@ import Chatbot from "./Chatbot/Chatbot";
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./admin/AdminDashboard'));
 const AdminManageMenu = lazy(() => import('./admin/AdminManageMenu'));
+const AdminManageOrders = lazy(() => import('./admin/AdminManageOrders'));
+const AdminManageUsers = lazy(() => import('./admin/AdminManageUsers'));
+
 
 function App() {
   return (
@@ -36,12 +47,18 @@ function App() {
         <Router>
           {/* 7. BỌC SUSPENSE */}
           <Suspense fallback={<LoadingSpinner />}>
+            <ToastContainer position="top-right" autoClose={3000} />
             <Routes>
               
-              {/* Nhóm 1: Các trang ADMIN */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="menu" element={<AdminManageMenu />} />
+              {/* Nhóm 1: Các trang ADMIN (ĐƯỢC BẢO VỆ) */}
+              {/* Chỉ Admin mới đi qua được lớp AdminRoute này */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="menu" element={<AdminManageMenu />} />
+                  <Route path="orders" element={<AdminManageOrders />} />
+                  <Route path="users" element={<AdminManageUsers />} />
+                </Route>
               </Route>
 
               {/* Nhóm 2: Các trang USER (Giữ nguyên cấu trúc cũ của bạn) */}
@@ -88,11 +105,7 @@ function App() {
                 element={
                   <>
                     <Header/>
-                    <Menu title={'Món Á'}/>
-                    <Menu title={'Món Âu'}/>
-                    <Menu title={"Rau Xanh"}/>
-                    <Menu title={"Đồ uống"}/>
-                    <Menu title={"Đồ nướng"}/>
+                    <Menu/>
                     <Footer />
                   </>
                 }
@@ -103,6 +116,16 @@ function App() {
                   <>
                     <Header/>
                     <CartPage/>
+                    <Footer />
+                  </>
+                  }
+              />
+              <Route 
+                path="/my-orders"
+                element={
+                  <>
+                    <Header/>
+                    <MyOrders />
                     <Footer />
                   </>
                   }
@@ -128,7 +151,6 @@ function App() {
                 } 
               />
               
-              
             </Routes>
             <Chatbot/>
           </Suspense>
@@ -139,4 +161,3 @@ function App() {
 }
 
 export default App;
-

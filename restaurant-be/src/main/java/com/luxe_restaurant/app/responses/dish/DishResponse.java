@@ -17,4 +17,10 @@ public class DishResponse {
     private String urlImage;
     private BigDecimal price;
     private String categoryName;
+    // --- QUAN TRỌNG: DÒNG NÀY GIÚP LƯU TRẠNG THÁI ---
+    private boolean active;
+    
+    // --- BẮT BUỘC PHẢI CÓ DÒNG NÀY ---
+    private Long categoryId;
+    
 }

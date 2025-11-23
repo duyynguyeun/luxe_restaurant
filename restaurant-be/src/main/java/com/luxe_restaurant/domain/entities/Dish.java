@@ -25,4 +25,8 @@ public class Dish {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+    // --- BẠN ĐANG THIẾU ĐOẠN NÀY ---
+    @Column(name = "is_active", columnDefinition = "boolean default true")
+    private boolean active = true; 
+    // --------------------------------
 }
