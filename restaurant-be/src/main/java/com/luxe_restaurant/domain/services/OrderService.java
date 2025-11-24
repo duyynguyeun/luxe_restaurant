@@ -6,6 +6,6 @@ import java.util.List;
 public interface OrderService {
     Order createOrder(OrderRequest request);
     List<Order> getAllOrders();
-    void updateStatus(Long id, String status);
+    void updateStatus(Long orderId, String statusStr);
     List<Order> getOrdersByUserId(Long userId);
 }

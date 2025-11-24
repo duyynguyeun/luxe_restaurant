@@ -51,6 +51,8 @@ public class SecurityConfig {
             "/api/category/**", // <--- THÊM DÒNG NÀY QUAN TRỌNG cho phan danh muc mon
             "/api/orders/**", // <--- Thêm dòng này cho phan order
             "/api/images",
+            "/api/orders/update-status/**",
+            "/api/orders/findOrder/**",
     };
 
     @Bean

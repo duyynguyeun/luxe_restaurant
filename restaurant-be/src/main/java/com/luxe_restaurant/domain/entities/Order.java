@@ -20,11 +20,16 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String customerName; // Tên khách (nếu không đăng nhập)
+    private String customerName;
+
     private String customerPhone;
+
     private String customerAddress;
 
     private BigDecimal totalPrice;
+
+    @Column
+    private String note;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

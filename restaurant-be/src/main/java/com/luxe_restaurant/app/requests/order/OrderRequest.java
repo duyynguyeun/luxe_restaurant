@@ -13,6 +13,7 @@ public class OrderRequest {
     private Long userId; // <-- THÊM DÒNG NÀY (để biết ai đặt)
     private PaymentMethod paymentMethod;
     private BigDecimal totalPrice;
+    private String note;
     private List<OrderItemRequest> items;
     
 }
