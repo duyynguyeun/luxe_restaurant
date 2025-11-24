@@ -50,6 +50,7 @@ public class SecurityConfig {
             "/api/dish/toggle/**",
             "/api/category/**", // <--- THÊM DÒNG NÀY QUAN TRỌNG cho phan danh muc mon
             "/api/orders/**", // <--- Thêm dòng này cho phan order
+            "/api/images",
     };
 
     @Bean

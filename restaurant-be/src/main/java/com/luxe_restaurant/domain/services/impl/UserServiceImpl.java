@@ -57,15 +57,13 @@ public class UserServiceImpl implements UserService {
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        // --- THÊM ĐOẠN NÀY: Cập nhật quyền nếu có ---
+
         if (request.getRole() != null && !request.getRole().isEmpty()) {
             try {
-                user.setRole(Role.valueOf(request.getRole())); // Chuyển String sang Enum
+                user.setRole(Role.valueOf(request.getRole()));
             } catch (IllegalArgumentException e) {
-                // Bỏ qua nếu role không hợp lệ
             }
         }
-        // -------------------------------------------
 
         User saveUser = userRepository.save(user);
 
