@@ -19,9 +19,9 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String dishName; // Lưu tên món tại thời điểm mua
+    private String dishName;
     private int quantity;
-    private BigDecimal price; // Lưu giá tại thời điểm mua
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
