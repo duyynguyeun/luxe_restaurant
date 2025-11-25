@@ -12,7 +12,7 @@ import java.util.List;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
-    private final OrderService orderService; // Dùng interface, không phải implementation
+    private final OrderService orderService;
 
     @PostMapping("/create")
     public Order createOrder(@RequestBody OrderRequest request) {
@@ -32,7 +32,7 @@ public class OrderController {
     }
 
     @GetMapping("/findOrder/{id}")
-    public List<Order> getOrdersByUser(@PathVariable Long userId) {
-        return orderService.getOrdersByUserId(userId);
+    public List<Order> getOrdersByUser(@PathVariable Long id) {
+        return orderService.getOrdersByUserId(id);
     }
 }

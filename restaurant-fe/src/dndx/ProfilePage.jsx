@@ -1,55 +1,154 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify'; // Sử dụng thư viện thông báo có sẵn
 
 const ProfilePage = () => {
-  const { currentUser, updateProfile } = useAuth();
+  const { currentUser, updateProfile } = useAuth(); // updateProfile ở đây chỉ để cập nhật lại context/localstorage sau khi API xong
   
-  // Lấy tên hiện tại từ context
-  const [username, setUsername] = useState(currentUser.username);
-  const [success, setSuccess] = useState('');
+  const [formData, setFormData] = useState({
+    userName: '',
+    email: '',
+    phone: '',
+    password: '', // Mật khẩu mới (để trống nếu không đổi)
+    role: 'CUSTOMER' // Mặc định giữ nguyên, hoặc lấy từ API
+  });
 
-  const handleSubmit = (e) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 1. Load thông tin người dùng mới nhất từ Server khi vào trang
+  useEffect(() => {
+    if (currentUser?.id) {
+      fetch(`${import.meta.env.VITE_API_URL}/api/user/find/${currentUser.id}`, {
+        headers: {
+          'Authorization': `Bearer ${currentUser.token}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        setFormData({
+          userName: data.userName || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          password: '', // Không hiển thị mật khẩu cũ
+          role: data.role || 'CUSTOMER'
+        });
+      })
+      .catch(err => console.error("Lỗi tải thông tin user:", err));
+    }
+  }, [currentUser]);
+
+  // 2. Xử lý thay đổi ô nhập liệu
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // 3. Gọi API Update
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccess('');
+    setIsLoading(true);
+
     try {
-      updateProfile(username); // Gọi hàm "giả" update
-      setSuccess('Cập nhật tên thành công!');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/update/${currentUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser.token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        
+        toast.success("Cập nhật hồ sơ thành công!");
+        
+        // Cập nhật lại Context/LocalStorage để Header hiển thị đúng tên mới
+        // Lưu ý: Hàm updateProfile trong AuthContext của bạn cần nhận object hoặc string tùy cách bạn viết.
+        // Ở đây mình giả sử bạn sửa lại AuthContext hoặc tự set lại LocalStorage:
+        const newStorageUser = { ...currentUser, username: updatedUser.userName };
+        localStorage.setItem('fakeUser', JSON.stringify(newStorageUser));
+        window.location.reload(); // Load lại để Header cập nhật tên mới
+      } else {
+        toast.error("Cập nhật thất bại! Vui lòng thử lại.");
+      }
     } catch (err) {
-      // (Trong hệ thống "giả" này thì sẽ không có lỗi)
+      console.error(err);
+      toast.error("Lỗi kết nối Server.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center py-20 bg-gray-100">
-      <div className="w-full max-w-lg bg-white p-8 rounded-xl shadow-lg">
-        <h2 className="text-3xl font-bold text-center mb-6">Chỉnh Sửa Hồ Sơ</h2>
+    <div className="flex justify-center items-center py-20 bg-gray-50 min-h-[80vh]">
+      <div className="w-full max-w-2xl bg-white p-10 rounded-2xl shadow-xl">
+        <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">Chỉnh Sửa Hồ Sơ</h2>
         
-        {success && <p className="bg-green-100 text-green-700 p-3 rounded-lg mb-4">{success}</p>}
-        
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Email (Không thể đổi)</label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {/* Email (Read Only) */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Email (Không thể đổi)</label>
             <input
               type="email"
-              className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-              value={currentUser.email}
-              disabled
+              name="email"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none"
+              value={formData.email}
+              readOnly
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Tên hiển thị</label>
+
+          {/* Tên hiển thị */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Tên hiển thị</label>
             <input
               type="text"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              name="userName"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              placeholder="Nhập tên hiển thị..."
+              value={formData.userName}
+              onChange={handleChange}
+              required
             />
           </div>
+
+          {/* Số điện thoại (Mới thêm) */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Số điện thoại</label>
+            <input
+              type="text"
+              name="phone"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              placeholder="Nhập số điện thoại..."
+              value={formData.phone}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Mật khẩu (Mới thêm) */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              Mật khẩu mới <span className="text-sm font-normal text-gray-500">(Để trống nếu không đổi)</span>
+            </label>
+            <input
+              type="password"
+              name="password"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              placeholder="Nhập mật khẩu mới..."
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-yellow-500 text-white py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
+            disabled={isLoading}
+            className="w-full bg-yellow-500 text-white py-3 rounded-lg font-bold text-lg hover:bg-yellow-600 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            Cập nhật hồ sơ
+            {isLoading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
           </button>
         </form>
       </div>
@@ -58,4 +157,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-

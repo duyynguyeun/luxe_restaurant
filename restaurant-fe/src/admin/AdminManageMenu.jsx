@@ -11,6 +11,38 @@ const AdminManageMenu = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false); 
   const [currentDishId, setCurrentDishId] = useState(null);
+  // ... các state cũ (menuItems, isModalOpen, ...)
+  const [isUploading, setIsUploading] = useState(false); // <--- State mới để theo dõi quá trình upload
+
+  // --- HÀM UPLOAD ẢNH ---
+  const handleUploadImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true); // Bắt đầu xoay vòng tròn loading
+    const data = new FormData();
+    data.append("file", file); // Key "file" phải khớp với @RequestParam bên Backend
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/images`, {
+        method: "POST",
+        body: data, // Gửi FormData, không cần Header Content-Type (trình duyệt tự xử lý)
+      });
+
+      if (response.ok) {
+        const imageUrl = await response.text(); // Backend trả về String URL
+        // Tự động điền URL vào ô input
+        setFormData(prev => ({ ...prev, urlImage: imageUrl }));
+      } else {
+        alert("Lỗi upload ảnh!");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Không thể kết nối server upload.");
+    } finally {
+      setIsUploading(false); // Tắt loading
+    }
+  };
 
   const [formData, setFormData] = useState({
     dishName: '',
@@ -213,17 +245,56 @@ const AdminManageMenu = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-1">Link Ảnh</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><FaImage className="text-gray-400"/></div>
-                  <input type="text" value={formData.urlImage} onChange={(e) => setFormData({...formData, urlImage: e.target.value})} className="pl-10 block w-full px-4 py-3 border rounded-lg" required />
+                <label className="block text-sm font-semibold mb-1">Ảnh món ăn</label>
+                
+                {/* 1. Ô Tải ảnh từ máy */}
+                <div className="mb-2 flex items-center gap-2">
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleUploadImage}
+                    className="block w-full text-sm text-slate-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-full file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-green-50 file:text-green-700
+                      hover:file:bg-green-100
+                    "
+                  />
+                  {isUploading && <span className="text-sm text-blue-600 font-bold animate-pulse">Đang tải lên...</span>}
                 </div>
+
+                {/* 2. Ô Link Ảnh (Tự động điền) */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaImage className="text-gray-400"/>
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Hoặc dán link ảnh trực tiếp..."
+                    value={formData.urlImage} 
+                    onChange={(e) => setFormData({...formData, urlImage: e.target.value})} 
+                    className="pl-10 block w-full px-4 py-3 border rounded-lg bg-gray-50 focus:bg-white transition-colors" 
+                    required 
+                  />
+                </div>
+                
+                {/* Xem trước ảnh nhỏ (nếu có link) */}
+                {formData.urlImage && !isUploading && (
+                    <div className="mt-2">
+                        <img src={formData.urlImage} alt="Preview" className="h-20 w-20 object-cover rounded-lg border shadow-sm" />
+                    </div>
+                )}
               </div>
 
               <div className="mt-8 flex gap-3 pt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-gray-100 font-bold py-3 rounded-xl">Hủy</button>
-                <button type="submit" className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg" disabled={isLoading}>
-                  {isLoading ? '...' : 'Lưu'}
+                <button 
+                  type="submit" 
+                  className={`flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg ${isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
+                  disabled={isLoading || isUploading} 
+                >
+                  {isLoading || isUploading ? 'Đang xử lý...' : 'Lưu'}
                 </button>
               </div>
             </form>

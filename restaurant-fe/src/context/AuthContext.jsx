@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        // Nếu server trả lỗi (vd: 401 - sai pass)
+       
         console.error("Đăng nhập thất bại:", response.status);
         return false; // Báo đăng nhập thất bại
       }
@@ -49,11 +49,11 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('fakeUser', JSON.stringify(userToStore));
       setCurrentUser(userToStore);
-      return true; // Báo đăng nhập thành công
+      return userToStore;
 
     } catch (error) {
       console.error('Lỗi khi đăng nhập:', error);
-      return false; // Báo đăng nhập thất bại
+      return null; // <--- SỬA: Trả về null nếu lỗi
     }
   };
 

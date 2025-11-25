@@ -13,11 +13,17 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    // 3. Gọi hàm login "giả"
-    const success = await login(email, password);
+    // Gọi hàm login và nhận lại dữ liệu user
+    const userData = await login(email, password);
 
-    if (success) {
-      navigate('/'); // Thành công, về trang chủ
+    if (userData) {
+      // Kiểm tra quyền (Role)
+      // Lưu ý: Role phải khớp với Enum trong Backend (ADMIN, CUSTOMER, STAFF...)
+      if (userData.role === 'ADMIN') {
+        navigate('/admin'); // Nếu là Admin -> Vào trang quản trị
+      } else {
+        navigate('/');      // Nếu là Khách/Nhân viên -> Về trang chủ
+      }
     } else {
       setError('Tên đăng nhập hoặc mật khẩu không đúng.');
     }
@@ -46,7 +52,7 @@ const Login = () => {
             <label className="block text-gray-700 mb-2">Mật khẩu</label>
             <input
               type="password"
-              placeholder="Nhập '123'"
+              placeholder="Nhập mật khẩu "
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

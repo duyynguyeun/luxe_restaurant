@@ -11,7 +11,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 
     public ChatBotServiceImpl(ChatClient.Builder chatClient) {
         this.chatClient = chatClient
-                .defaultSystem("Bạn là trợ lý ảo của nhà hàng Luxe Restaurant. Bạn sẽ trả lời v tư vấn khách hàng chuyên nghiệp và ngắn gọn có thể c chút thoải mái hóm hỉnh.")
+                .defaultSystem("Bạn là trợ lý ảo của nhà hàng Luxe Restaurant. Bạn sẽ trả lời v tư vấn khách hàng chuyên nghiệp và ngắn gọn. Món bestseller của nhà hàng là Beefsteak và Phở Bò. Và đồ uống ngon nhất là Blue Ocean Soda")
                 .build();
     }
 

@@ -10,7 +10,7 @@ const MyOrders = () => {
   // Hàm tải danh sách đơn hàng
   const fetchOrders = () => {
     if (currentUser && currentUser.id) {
-      fetch(`${import.meta.env.VITE_API_URL}/api/orders/my-orders/${currentUser.id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/orders/findOrder/${currentUser.id}`)
         .then(res => res.json())
         .then(data => setOrders(data.reverse())) // Đơn mới nhất lên đầu
         .catch(err => console.error(err));

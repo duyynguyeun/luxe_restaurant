@@ -5,12 +5,11 @@ import com.luxe_restaurant.app.responses.dish.DishResponse;
 import com.luxe_restaurant.domain.services.DishService;
 import lombok.RequiredArgsConstructor;
 
-// <-- 1. THÊM DÒNG NÀY
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"}) // <-- 2. THÊM DÒNG NÀY
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 @RestController
 @RequestMapping("/api/dish")
 @RequiredArgsConstructor
@@ -42,7 +41,7 @@ public class DishController {
     public DishResponse findDish(@PathVariable Long id){
         return dishService.getDishById(id);
     }
-    // --- BẠN CẦN ĐẢM BẢO CÓ ĐOẠN NÀY ---
+
     @PutMapping("/toggle/{id}")
     public DishResponse toggleDish(@PathVariable Long id) {
         return dishService.toggleDishStatus(id);
