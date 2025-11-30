@@ -26,6 +26,7 @@ const CartPage = lazy(() => import('./giohang/CartPage'));
 const Login = lazy(() => import('./dndx/Login'));
 const Signup = lazy(() => import('./dndx/Signup'));
 const ContactPage = lazy(() => import('./Lienhe/ContactPage'));
+const ForgotPassword = lazy(() => import('./dndx/ForgotPassword'));
 const MyOrders = lazy(() => import('./giohang/MyOrders'));
 // Chúng ta vẫn cần lazy load trang Profile
 const ProfilePage = lazy(() => import('./dndx/ProfilePage')); 
@@ -90,6 +91,15 @@ function App() {
                   <>
                     <Header />
                     <Login />
+                  </>
+                }
+              />
+              <Route
+                path="/forgot-password" // <-- THÊM ROUTE MỚI NÀY
+                element={
+                  <>
+                    <Header />
+                    <ForgotPassword />
                   </>
                 }
               />

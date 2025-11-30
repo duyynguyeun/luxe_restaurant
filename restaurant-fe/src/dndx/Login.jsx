@@ -59,6 +59,11 @@ const Login = () => {
               required
             />
           </div>
+          <div className='text-right mt-1'>
+                <Link to="/forgot-password" className="text-xs text-blue-500 hover:underline">
+                    Quên mật khẩu?
+                </Link>
+            </div>
           <button
             type="submit"
             className="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors"
