@@ -4,11 +4,8 @@ import com.luxe_restaurant.app.requests.LoginRequest;
 import com.luxe_restaurant.app.responses.LoginResponse;
 import com.luxe_restaurant.domain.services.jwt.AuthenticationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin; // <-- 1. THÊM DÒNG NÀY
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"}) // <-- 2. THÊM DÒNG NÀY
 
