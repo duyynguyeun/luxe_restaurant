@@ -36,6 +36,7 @@ const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./admin/AdminDashboard'));
 const AdminManageMenu = lazy(() => import('./admin/AdminManageMenu'));
 const AdminManageOrders = lazy(() => import('./admin/AdminManageOrders'));
+const AdminManageReservations = lazy(() => import('./admin/AdminManageReservations'));              
 const AdminManageUsers = lazy(() => import('./admin/AdminManageUsers'));
 
 
@@ -57,6 +58,7 @@ function App() {
                   <Route index element={<AdminDashboard />} />
                   <Route path="menu" element={<AdminManageMenu />} />
                   <Route path="orders" element={<AdminManageOrders />} />
+                  <Route path="reservations" element={<AdminManageReservations />} />
                   <Route path="users" element={<AdminManageUsers />} />
                 </Route>
               </Route>
