@@ -11,8 +11,7 @@ import java.util.List;
 public class CustomUserDetail implements UserDetails {
 
     private final User user;
-    
-    // THÊM PHƯƠNG THỨC NÀY ĐỂ LẤY USER GỐC:
+
     public User getUser() {
         return user;
     }
