@@ -22,7 +22,6 @@ public class DishServiceImpl implements DishService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
-    // Hàm map dữ liệu an toàn
     private DishResponse mapToResponse(Dish dish) {
         DishResponse response = modelMapper.map(dish, DishResponse.class);
         if (dish.getCategory() != null) {

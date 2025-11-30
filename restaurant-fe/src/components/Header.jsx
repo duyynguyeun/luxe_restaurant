@@ -32,7 +32,10 @@ const Header = () => {
               <Link to="/menu" className="hover:text-yellow-400 transition-colors duration-300">Thực đơn</Link>
             </li>
             <li>
-              <Link to="/contactPage" className="hover:text-yellow-400 transition-colors duration-300">Liên hệ</Link>
+              <Link to="/contactPage" className="hover:text-yellow-400 transition-colors duration-300">Giới thiệu</Link>
+            </li>
+            <li>
+              <Link to="/menu" className="hover:text-yellow-400 transition-colors duration-300">Ưu đãi</Link>
             </li>
             <li>
               <Link to="/cart" className="hover:text-yellow-400 transition-colors duration-300">🛒 Giỏ hàng</Link>

@@ -20,11 +20,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
 
-    // QUY TẮC TÍCH ĐIỂM
     private static final BigDecimal BASE_POINTS = new BigDecimal("100"); // 500 điểm cố định/đơn
     private static final BigDecimal MONEY_RATIO = new BigDecimal("1000"); // 1000đ = 1 điểm
 
-    // LUỒNG CHUYỂN TRẠNG THÁI HỢP LỆ
     private static final Map<OrderStatus, List<OrderStatus>> VALID_TRANSITIONS = Map.of(
             OrderStatus.PENDING, List.of(OrderStatus.PAID, OrderStatus.CANCELLED),
             OrderStatus.PAID, List.of(OrderStatus.PREPARING, OrderStatus.CANCELLED),
@@ -45,7 +43,6 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setOrderDate(LocalDateTime.now());
 
-        // Tạo OrderDetail
         List<OrderDetail> details = new ArrayList<>();
         for (OrderItemRequest item : request.getItems()) {
             OrderDetail detail = OrderDetail.builder()
@@ -77,9 +74,8 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus currentStatus = order.getStatus();
         OrderStatus newStatus = OrderStatus.valueOf(statusStr.toUpperCase());
 
-        // Kiểm tra chuyển đổi hợp lệ
         if (currentStatus == newStatus) {
-            return; // Đã là trạng thái này rồi
+            return;
         }
 
         List<OrderStatus> validNext = VALID_TRANSITIONS.get(currentStatus);
@@ -99,18 +95,13 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    /**
-     * Tích điểm cho user khi hoàn thành đơn
-     */
     private void addPointsToUser(Order order) {
         User user = order.getUser();
 
-        // Tính điểm: 500 + (totalPrice / 1000)
         BigDecimal moneyPoints = order.getTotalPrice()
                 .divide(MONEY_RATIO, 0, BigDecimal.ROUND_DOWN);
         BigDecimal totalPoints = BASE_POINTS.add(moneyPoints);
 
-        // Cộng điểm vào User
         BigDecimal currentPoints = user.getPoint() != null ? user.getPoint() : BigDecimal.ZERO;
         user.setPoint(currentPoints.add(totalPoints));
         userRepository.save(user);

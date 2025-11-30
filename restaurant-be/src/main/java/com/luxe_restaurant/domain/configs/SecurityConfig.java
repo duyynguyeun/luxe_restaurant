@@ -53,6 +53,8 @@ public class SecurityConfig {
             "/api/images",
             "/api/orders/update-status/**",
             "/api/orders/findOrder/**",
+            "/api/promotion/**",
+            "/api/promotion/update/**",
     };
 
     @Bean

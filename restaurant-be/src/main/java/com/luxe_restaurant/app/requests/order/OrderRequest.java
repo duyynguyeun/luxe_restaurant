@@ -10,7 +10,7 @@ public class OrderRequest {
     private String customerName;
     private String customerPhone;
     private String customerAddress;
-    private Long userId; // <-- THÊM DÒNG NÀY (để biết ai đặt)
+    private Long userId;
     private PaymentMethod paymentMethod;
     private BigDecimal totalPrice;
     private String note;
