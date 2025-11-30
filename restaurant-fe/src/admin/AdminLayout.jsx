@@ -6,7 +6,8 @@ import {
   MdFastfood, 
   MdShoppingBag, 
   MdPeople, 
-  MdExitToApp 
+  MdExitToApp,
+  MdEventSeat,
 } from 'react-icons/md';
 
 const AdminLayout = () => {
@@ -23,6 +24,7 @@ const AdminLayout = () => {
           <SidebarLink to="/admin" icon={<MdDashboard />} label="Dashboard" />
           <SidebarLink to="/admin/menu" icon={<MdFastfood />} label="Quản lý Món ăn" />
           <SidebarLink to="/admin/orders" icon={<MdShoppingBag />} label="Quản lý Đơn hàng" />
+          <SidebarLink to="/admin/reservations" icon={<MdEventSeat />} label="Quản lý Đặt bàn" />
           <SidebarLink to="/admin/users" icon={<MdPeople />} label="Quản lý Người dùng" />
         </nav>
 
