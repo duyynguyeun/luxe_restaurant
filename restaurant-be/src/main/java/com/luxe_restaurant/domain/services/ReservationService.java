@@ -22,4 +22,6 @@ public interface ReservationService {
     void cancelReservation(Long reservationId);
 
     void updateTableStatus(Long tableId, TableStatus status);
+
+    List<Reservation> getAllReservations(); 
 }

@@ -50,4 +50,8 @@ public class ReservationController {
     ) {
         service.updateTableStatus(tableId, status);
     }
+    @GetMapping("/getall")
+    public List<Reservation> getAllReservations() {
+        return service.getAllReservations();
+    }
 }

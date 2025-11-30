@@ -74,4 +74,8 @@ public class ReservationServiceImpl implements ReservationService {
         table.setStatus(status);
         tableRepo.save(table);
     }
+    @Override
+    public List<Reservation> getAllReservations() {
+        return reservationRepo.findAll();
+    }
 }
