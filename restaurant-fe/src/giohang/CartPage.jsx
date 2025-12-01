@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { CartContext } from "../giohang/CartContext";
+// Import đầy đủ các icon cần dùng
 import { FaQrcode, FaMoneyBillWave, FaTimes, FaCalendarAlt, FaHistory, FaTrash, FaEdit, FaChair, FaClock, FaHashtag, FaCheckCircle, FaBan } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { toast } from 'react-toastify';
@@ -11,14 +12,16 @@ import Datban from "../components/Datban";
 
 moment.locale('vi');
 
+// --- CẤU HÌNH NGÂN HÀNG (QUAN TRỌNG: Đặt ở ngoài component) ---
 const MY_BANK = {
   BANK_ID: "MB", 
   ACCOUNT_NO: "0386984907", 
   ACCOUNT_NAME: "NGUYEN DUY HIEU", 
 };
 
-// --- HÀM GOM NHÓM & SẮP XẾP ---
+// --- HÀM GOM NHÓM ĐƠN ĐẶT BÀN ---
 const groupReservations = (reservations) => {
+    if (!reservations) return []; // Bảo vệ nếu data null
     const groups = {};
     reservations.forEach(res => {
         const startRaw = res.startTime;
@@ -71,7 +74,22 @@ const CartPage = () => {
   const [realUserPhone, setRealUserPhone] = useState(""); 
   const [realUserName, setRealUserName] = useState("");
 
-  // --- 1. LẤY THÔNG TIN USER ---
+  // --- HÀM TẠO MÃ QR (Đã gia cố để không bị lỗi crash) ---
+  const generateQRUrl = (amount) => {
+    try {
+        // Mặc định nội dung nếu chưa nhập SĐT
+        const phoneNote = customerInfo.phone ? `TT ${customerInfo.phone}` : "Thanh toan"; 
+        // Loại bỏ ký tự đặc biệt để tránh lỗi URL
+        const content = phoneNote.replace(/[^a-zA-Z0-9 ]/g, "");
+        
+        return `https://img.vietqr.io/image/${MY_BANK.BANK_ID}-${MY_BANK.ACCOUNT_NO}-compact.png?amount=${amount}&addInfo=${encodeURIComponent(content)}&accountName=${encodeURIComponent(MY_BANK.ACCOUNT_NAME)}`;
+    } catch (e) {
+        console.error("Lỗi tạo QR:", e);
+        return ""; // Trả về rỗng nếu lỗi để không crash app
+    }
+  };
+
+  // --- LẤY THÔNG TIN USER ---
   useEffect(() => {
     const getUserInfo = async () => {
         if (currentUser?.id) {
@@ -88,7 +106,7 @@ const CartPage = () => {
     getUserInfo();
   }, [currentUser]);
 
-  // --- 2. TẢI ĐẶT BÀN ---
+  // --- TẢI DANH SÁCH ĐẶT BÀN ---
   const fetchMyReservations = async () => {
     if (!realUserPhone) return;
     try {
@@ -105,43 +123,7 @@ const CartPage = () => {
     if (activeTab === "RESERVATION") fetchMyReservations();
   }, [activeTab, realUserPhone]);
 
-  // --- CÁC HÀM XỬ LÝ ĐẶT BÀN ---
-  const handleCancelReservation = async (group) => {
-    const localTime = moment.utc(group.startTime).local().format('HH:mm');
-    Swal.fire({
-        title: 'Hủy đặt bàn?',
-        text: `Hủy bàn số ${group.tableNumbers.join(', ')} lúc ${localTime}?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Đồng ý hủy',
-        cancelButtonText: 'Không'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                for (const id of group.ids) {
-                    await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/cancel/${id}`, { method: 'PUT' });
-                }
-                toast.success("Đã hủy thành công.");
-                fetchMyReservations();
-            } catch { toast.error("Lỗi khi hủy."); }
-        }
-    });
-  };
-
-  const openEditModal = (group) => { setEditingGroup(group); setIsEditModalOpen(true); };
-  
-  const onEditSuccess = async () => {
-    if (editingGroup) {
-        for (const id of editingGroup.ids) await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/cancel/${id}`, { method: 'PUT' });
-        toast.info("Cập nhật lịch thành công!"); setEditingGroup(null); fetchMyReservations();
-    }
-  };
-
-  const onNewBookingSuccess = () => { fetchMyReservations(); };
-
-  // --- HÀM THANH TOÁN (ĐÃ SỬA LỖI THIẾU HÀM NÀY) ---
+  // --- HÀM XỬ LÝ THANH TOÁN (MỞ MODAL) ---
   const handleCheckoutClick = () => {
     if (!currentUser) {
       Swal.fire({
@@ -156,20 +138,76 @@ const CartPage = () => {
       });
       return;
     }
-    // Mở modal thanh toán
+    // Set lại thông tin mặc định nếu có
+    if (!customerInfo.name && realUserName) setCustomerInfo(prev => ({...prev, name: realUserName}));
+    if (!customerInfo.phone && realUserPhone) setCustomerInfo(prev => ({...prev, phone: realUserPhone}));
+    
     setIsPaymentModalOpen(true);
   };
 
+  // --- GỬI ĐƠN HÀNG ---
   const handlePayment = async () => {
-    if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) { toast.warning("Vui lòng điền đủ thông tin!"); return; }
-    const orderData = { userId: currentUser?.id, customerName: customerInfo.name, customerPhone: customerInfo.phone, customerAddress: customerInfo.address, note: customerInfo.note, paymentMethod, totalPrice: total, items: cart.map(i => ({ dishName: i.ten, quantity: i.quantity, price: i.gia })) };
+    if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) { 
+        toast.warning("Vui lòng điền đủ thông tin: Tên, SĐT, Địa chỉ!"); 
+        return; 
+    }
+    
+    const orderData = { 
+        userId: currentUser?.id, 
+        customerName: customerInfo.name, 
+        customerPhone: customerInfo.phone, 
+        customerAddress: customerInfo.address, 
+        note: customerInfo.note, 
+        paymentMethod, 
+        totalPrice: total, 
+        items: cart.map(i => ({ dishName: i.ten, quantity: i.quantity, price: i.gia })) 
+    };
+
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/create`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(orderData) });
-      if (res.ok) { toast.success("Đặt hàng thành công!"); setIsPaymentModalOpen(false); window.location.href = "/my-orders"; }
-      else toast.error("Lỗi đặt hàng.");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/create`, { 
+          method: "POST", 
+          headers: { "Content-Type": "application/json" }, 
+          body: JSON.stringify(orderData) 
+      });
+      
+      if (res.ok) { 
+          toast.success("Đặt hàng thành công!"); 
+          setIsPaymentModalOpen(false); 
+          window.location.href = "/my-orders"; 
+      } else { 
+          toast.error("Lỗi đặt hàng."); 
+      }
     } catch { toast.error("Lỗi kết nối."); }
   };
 
+  // --- XỬ LÝ ĐẶT BÀN ---
+  const handleCancelReservation = async (group) => {
+    const localTime = moment.utc(group.startTime).local().format('HH:mm');
+    Swal.fire({
+        title: 'Hủy đặt bàn?',
+        text: `Hủy bàn số ${group.tableNumbers.join(', ')} lúc ${localTime}?`,
+        icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Đồng ý hủy', cancelButtonText: 'Không'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                for (const id of group.ids) await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/cancel/${id}`, { method: 'PUT' });
+                toast.success("Đã hủy."); fetchMyReservations();
+            } catch { toast.error("Lỗi khi hủy."); }
+        }
+    });
+  };
+
+  const openEditModal = (group) => { setEditingGroup(group); setIsEditModalOpen(true); };
+  
+  const onEditSuccess = async () => {
+    if (editingGroup) {
+        for (const id of editingGroup.ids) await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/cancel/${id}`, { method: 'PUT' });
+        toast.info("Đã cập nhật!"); setEditingGroup(null); fetchMyReservations();
+    }
+  };
+
+  const onNewBookingSuccess = () => { fetchMyReservations(); };
   const handleOpenBooking = () => {
       if(!realUserPhone) {
           toast.warning("Vui lòng cập nhật Số điện thoại trong Hồ sơ trước!");
@@ -179,15 +217,12 @@ const CartPage = () => {
       setIsNewBookingModalOpen(true);
   }
 
-  // --- HELPER RENDER ---
+  // --- RENDER BADGE ---
   const renderStatusBadge = (status) => {
       switch (status) {
-          case 'RESERVED':
-              return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200 shadow-sm flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Đang giữ chỗ</span>;
-          case 'CANCELLED':
-              return <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-100 flex items-center gap-1"><FaBan size={10}/> Đã hủy</span>;
-          default:
-              return <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">Hoàn thành</span>;
+          case 'RESERVED': return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200 shadow-sm flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Đang giữ chỗ</span>;
+          case 'CANCELLED': return <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-100 flex items-center gap-1"><FaBan size={10}/> Đã hủy</span>;
+          default: return <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">Hoàn thành</span>;
       }
   };
 
@@ -251,8 +286,6 @@ const CartPage = () => {
                         </div>
                         <div className="flex flex-col md:flex-row justify-end items-center gap-8 border-t border-gray-100 pt-8">
                             <div className="text-gray-600 text-lg">Tổng cộng: <span className="text-[#174C34] text-4xl font-extrabold ml-3">{total.toLocaleString()}₫</span></div>
-                            
-                            {/* Nút thanh toán đã gọi đúng hàm handleCheckoutClick */}
                             <button onClick={handleCheckoutClick} className="bg-yellow-500 text-white px-12 py-4 rounded-full font-bold shadow-lg hover:bg-yellow-600 transition transform hover:-translate-y-1 hover:shadow-2xl text-lg">
                                 Thanh toán ngay
                             </button>
@@ -278,7 +311,7 @@ const CartPage = () => {
                             <FaCalendarAlt className="text-5xl text-[#174C34] opacity-60"/>
                         </div>
                         <h3 className="text-2xl font-bold text-gray-800 mb-2">Chưa có lịch đặt bàn</h3>
-                        <p className="text-gray-500">Bạn chưa đặt bàn nào sắp tới. Đặt ngay để giữ chỗ!</p>
+                        <p className="text-gray-500">Bạn chưa đặt bàn nào sắp tới.</p>
                         <div className="mt-6 inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full text-sm text-gray-600">
                             <FaClock className="text-gray-400"/> SĐT đăng ký: <span className="font-bold text-gray-800">{realUserPhone || "..."}</span>
                         </div>
@@ -306,7 +339,7 @@ const CartPage = () => {
                             const localEndTime = moment.utc(group.endTime).local();
 
                             return (
-                                <div key={idx} className={`relative bg-white rounded-3xl overflow-hidden transition-all duration-300 ${isCancelled ? 'opacity-60 grayscale-[0.5] border border-gray-200' : 'shadow-lg border border-green-100 hover:shadow-xl hover:border-green-300'}`}>
+                                <div key={idx} className={`relative bg-white rounded-3xl overflow-hidden transition-all duration-300 ${isCancelled ? 'opacity-70 grayscale-[0.3] border border-gray-200' : 'shadow-lg border border-green-100 hover:shadow-xl hover:border-green-300'}`}>
                                     <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isReserved ? 'bg-green-500' : isCancelled ? 'bg-red-400' : 'bg-gray-400'}`}></div>
                                     <div className="p-6 pl-8">
                                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 pb-4 border-b border-dashed border-gray-200">
@@ -370,32 +403,39 @@ const CartPage = () => {
         )}
       </div>
 
+      {/* --- MODAL THANH TOÁN --- */}
       {isPaymentModalOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md animate-fade-in relative">
             <button onClick={() => setIsPaymentModalOpen(false)} className="absolute top-5 right-5 text-gray-400 hover:text-red-500 transition"><FaTimes size={22}/></button>
             <h2 className="text-2xl font-extrabold mb-6 text-center text-gray-800">Thanh toán đơn hàng</h2>
+            
             <div className="space-y-4 mb-6">
-               <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Tên người nhận" onChange={e => setCustomerInfo({...customerInfo, name: e.target.value})} />
-               <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Số điện thoại" onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})} />
-               <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Địa chỉ giao hàng" onChange={e => setCustomerInfo({...customerInfo, address: e.target.value})} />
-               <textarea className="w-full border border-gray-300 p-3.5 rounded-xl bg-yellow-50 focus:ring-2 focus:ring-yellow-400 outline-none resize-none transition" rows="2" placeholder="Ghi chú món ăn" onChange={e => setCustomerInfo({...customerInfo, note: e.target.value})} />
+               <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Tên người nhận" value={customerInfo.name} onChange={e => setCustomerInfo({...customerInfo, name: e.target.value})} />
+               <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Số điện thoại" value={customerInfo.phone} onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})} />
+               <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Địa chỉ giao hàng" value={customerInfo.address} onChange={e => setCustomerInfo({...customerInfo, address: e.target.value})} />
+               <textarea className="w-full border border-gray-300 p-3.5 rounded-xl bg-yellow-50 focus:ring-2 focus:ring-yellow-400 outline-none resize-none transition" rows="2" placeholder="Ghi chú món ăn..." value={customerInfo.note} onChange={e => setCustomerInfo({...customerInfo, note: e.target.value})} />
             </div>
+
             <div className="grid grid-cols-2 gap-3 mb-6">
                 <button onClick={()=>setPaymentMethod("CASH")} className={`p-3 rounded-xl flex flex-col items-center gap-1 transition border-2 ${paymentMethod==="CASH"?"border-green-500 bg-green-50 text-green-700 font-bold":"border-transparent bg-gray-100 text-gray-600 hover:bg-gray-200"}`}><FaMoneyBillWave size={20}/> Tiền mặt</button>
                 <button onClick={()=>setPaymentMethod("QR_CODE")} className={`p-3 rounded-xl flex flex-col items-center gap-1 transition border-2 ${paymentMethod==="QR_CODE"?"border-blue-500 bg-blue-50 text-blue-700 font-bold":"border-transparent bg-gray-100 text-gray-600 hover:bg-gray-200"}`}><FaQrcode size={20}/> Chuyển khoản</button>
             </div>
+
+            {/* PHẦN QR CODE: ĐÃ ĐƯỢC BẢO VỆ KHỎI LỖI CRASH */}
             {paymentMethod === "QR_CODE" && (
                 <div className="text-center mb-6 bg-blue-50 p-4 rounded-2xl border border-blue-100">
                     <img src={generateQRUrl(total)} className="w-32 mx-auto mb-2 mix-blend-multiply" alt="QR"/>
                     <p className="text-xs text-blue-600 font-medium">Quét mã để thanh toán nhanh</p>
                 </div>
             )}
+
             <button onClick={handlePayment} className="w-full bg-[#174C34] text-white py-4 rounded-xl font-bold hover:bg-green-800 shadow-xl transition transform active:scale-95 text-lg">ĐẶT HÀNG NGAY • {total.toLocaleString()}₫</button>
           </div>
         </div>
       )}
 
+      {/* MODAL SỬA */}
       {isEditModalOpen && editingGroup && (
         <Datban 
             onClose={() => setIsEditModalOpen(false)}
@@ -410,6 +450,7 @@ const CartPage = () => {
         />
       )}
 
+      {/* MODAL ĐẶT MỚI */}
       {isNewBookingModalOpen && (
         <Datban 
             onClose={() => setIsNewBookingModalOpen(false)} 
