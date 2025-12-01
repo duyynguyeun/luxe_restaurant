@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaEnvelopeOpenText } from 'react-icons/fa';
 import { Link, Outlet } from 'react-router-dom';
 import { 
   MdDashboard, 
@@ -25,6 +26,7 @@ const AdminLayout = () => {
           <SidebarLink to="/admin/menu" icon={<MdFastfood />} label="Quản lý Món ăn" />
           <SidebarLink to="/admin/orders" icon={<MdShoppingBag />} label="Quản lý Đơn hàng" />
           <SidebarLink to="/admin/reservations" icon={<MdEventSeat />} label="Quản lý Đặt bàn" />
+          <SidebarLink to="/admin/reports" icon={<FaEnvelopeOpenText />} label="Phản hồi khách hàng" />
           
           <div className="pt-4 mt-4 border-t border-gray-700">
             <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Tài khoản</p>

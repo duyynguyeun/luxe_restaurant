@@ -21,7 +21,6 @@ const MY_BANK = {
 const groupReservations = (reservations) => {
     const groups = {};
     reservations.forEach(res => {
-        // Dùng thời gian gốc để gom nhóm
         const startRaw = res.startTime;
         const endRaw = res.endTime;
         const key = `${res.customerPhone}-${startRaw}-${endRaw}`;
@@ -39,16 +38,18 @@ const groupReservations = (reservations) => {
         }
         groups[key].ids.push(res.id);
         if (res.table?.tableNumber) groups[key].tableNumbers.push(res.table.tableNumber);
-        
-        // Nếu trong nhóm có ít nhất 1 cái là RESERVED thì cả nhóm là RESERVED
         if (res.status === 'RESERVED') groups[key].status = 'RESERVED';
     });
     
-    // Sắp xếp: Ưu tiên RESERVED lên đầu, sau đó đến Mới nhất
     return Object.values(groups).sort((a, b) => {
         if (a.status === 'RESERVED' && b.status !== 'RESERVED') return -1;
         if (a.status !== 'RESERVED' && b.status === 'RESERVED') return 1;
-        return new Date(b.startTime) - new Date(a.startTime);
+        
+        if (a.status === 'RESERVED') {
+            return new Date(a.startTime) - new Date(b.startTime);
+        } else {
+            return new Date(b.startTime) - new Date(a.startTime);
+        }
     });
 };
 
@@ -70,7 +71,7 @@ const CartPage = () => {
   const [realUserPhone, setRealUserPhone] = useState(""); 
   const [realUserName, setRealUserName] = useState("");
 
-  // --- 1. LẤY THÔNG TIN USER (SĐT) ---
+  // --- 1. LẤY THÔNG TIN USER ---
   useEffect(() => {
     const getUserInfo = async () => {
         if (currentUser?.id) {
@@ -94,7 +95,6 @@ const CartPage = () => {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/getall`);
         if (res.ok) {
             const data = await res.json();
-            // Lọc đúng SĐT
             const myData = data.filter(r => r.customerPhone === realUserPhone);
             setMyReservations(groupReservations(myData));
         }
@@ -105,11 +105,9 @@ const CartPage = () => {
     if (activeTab === "RESERVATION") fetchMyReservations();
   }, [activeTab, realUserPhone]);
 
-  // --- CÁC HÀM XỬ LÝ ---
+  // --- CÁC HÀM XỬ LÝ ĐẶT BÀN ---
   const handleCancelReservation = async (group) => {
-    // Hiển thị giờ Local trong thông báo
     const localTime = moment.utc(group.startTime).local().format('HH:mm');
-    
     Swal.fire({
         title: 'Hủy đặt bàn?',
         text: `Hủy bàn số ${group.tableNumbers.join(', ')} lúc ${localTime}?`,
@@ -143,7 +141,25 @@ const CartPage = () => {
 
   const onNewBookingSuccess = () => { fetchMyReservations(); };
 
-  // --- THANH TOÁN ---
+  // --- HÀM THANH TOÁN (ĐÃ SỬA LỖI THIẾU HÀM NÀY) ---
+  const handleCheckoutClick = () => {
+    if (!currentUser) {
+      Swal.fire({
+        title: "Chưa đăng nhập!",
+        text: "Vui lòng đăng nhập để thanh toán.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Đăng nhập",
+        cancelButtonText: "Hủy"
+      }).then((result) => {
+        if (result.isConfirmed) navigate("/login");
+      });
+      return;
+    }
+    // Mở modal thanh toán
+    setIsPaymentModalOpen(true);
+  };
+
   const handlePayment = async () => {
     if (!customerInfo.name || !customerInfo.phone || !customerInfo.address) { toast.warning("Vui lòng điền đủ thông tin!"); return; }
     const orderData = { userId: currentUser?.id, customerName: customerInfo.name, customerPhone: customerInfo.phone, customerAddress: customerInfo.address, note: customerInfo.note, paymentMethod, totalPrice: total, items: cart.map(i => ({ dishName: i.ten, quantity: i.quantity, price: i.gia })) };
@@ -163,6 +179,18 @@ const CartPage = () => {
       setIsNewBookingModalOpen(true);
   }
 
+  // --- HELPER RENDER ---
+  const renderStatusBadge = (status) => {
+      switch (status) {
+          case 'RESERVED':
+              return <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200 shadow-sm flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Đang giữ chỗ</span>;
+          case 'CANCELLED':
+              return <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-100 flex items-center gap-1"><FaBan size={10}/> Đã hủy</span>;
+          default:
+              return <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold">Hoàn thành</span>;
+      }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen py-10 px-4 font-sans">
       <div className="max-w-5xl mx-auto">
@@ -179,7 +207,7 @@ const CartPage = () => {
             </div>
         </div>
 
-        {/* --- CONTENT 1: GIỎ HÀNG (GIỮ NGUYÊN) --- */}
+        {/* --- CONTENT 1: GIỎ HÀNG --- */}
         {activeTab === "CART" && (
             <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden animate-fade-in">
                 {cart.length === 0 ? (
@@ -223,14 +251,18 @@ const CartPage = () => {
                         </div>
                         <div className="flex flex-col md:flex-row justify-end items-center gap-8 border-t border-gray-100 pt-8">
                             <div className="text-gray-600 text-lg">Tổng cộng: <span className="text-[#174C34] text-4xl font-extrabold ml-3">{total.toLocaleString()}₫</span></div>
-                            <button onClick={handleCheckoutClick} className="bg-yellow-500 text-white px-12 py-4 rounded-full font-bold shadow-lg hover:bg-yellow-600 transition transform hover:-translate-y-1 hover:shadow-2xl text-lg">Thanh toán ngay</button>
+                            
+                            {/* Nút thanh toán đã gọi đúng hàm handleCheckoutClick */}
+                            <button onClick={handleCheckoutClick} className="bg-yellow-500 text-white px-12 py-4 rounded-full font-bold shadow-lg hover:bg-yellow-600 transition transform hover:-translate-y-1 hover:shadow-2xl text-lg">
+                                Thanh toán ngay
+                            </button>
                         </div>
                     </div>
                 )}
             </div>
         )}
 
-        {/* --- CONTENT 2: QUẢN LÝ ĐẶT BÀN (PREMIUM UI + FIX TIME) --- */}
+        {/* --- CONTENT 2: QUẢN LÝ ĐẶT BÀN --- */}
         {activeTab === "RESERVATION" && (
             <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
                 {!currentUser ? (
@@ -270,37 +302,37 @@ const CartPage = () => {
                             const isCancelled = group.status === 'CANCELLED';
                             const isReserved = group.status === 'RESERVED';
                             
-                            // FIX GIỜ: Chuyển UTC -> Local
                             const localStartTime = moment.utc(group.startTime).local();
                             const localEndTime = moment.utc(group.endTime).local();
 
                             return (
                                 <div key={idx} className={`relative bg-white rounded-3xl overflow-hidden transition-all duration-300 ${isCancelled ? 'opacity-60 grayscale-[0.5] border border-gray-200' : 'shadow-lg border border-green-100 hover:shadow-xl hover:border-green-300'}`}>
-                                    
-                                    {/* Dải màu trạng thái bên trái */}
                                     <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isReserved ? 'bg-green-500' : isCancelled ? 'bg-red-400' : 'bg-gray-400'}`}></div>
-
                                     <div className="p-6 pl-8">
-                                        {/* Header: Ngày & Trạng thái */}
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ngày đặt</p>
-                                                <h3 className="text-xl font-extrabold text-gray-800 capitalize flex items-center gap-2">
-                                                    {localStartTime.format("dddd, DD/MM/YYYY")}
-                                                </h3>
+                                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 pb-4 border-b border-dashed border-gray-200">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3.5 rounded-2xl shadow-sm ${isReserved ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-500'}`}>
+                                                    <FaCalendarAlt size={24}/>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Ngày đặt</p>
+                                                    <h3 className="text-xl font-extrabold text-gray-800 capitalize">
+                                                        {localStartTime.format("dddd, DD/MM/YYYY")}
+                                                    </h3>
+                                                </div>
                                             </div>
-                                            <div className="flex flex-col items-end">
-                                                {isReserved && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200 flex items-center gap-1"><FaCheckCircle/> Đang giữ chỗ</span>}
-                                                {isCancelled && <span className="bg-red-50 text-red-500 px-3 py-1 rounded-full text-xs font-bold border border-red-100 flex items-center gap-1"><FaBan/> Đã hủy</span>}
-                                                <span className="text-xs text-gray-400 mt-1 font-mono">#{group.ids[0]}</span>
+                                            <div className="mt-3 md:mt-0 flex flex-col items-end">
+                                                {renderStatusBadge(group.status)}
+                                                <span className="text-xs text-gray-400 mt-1.5 font-mono flex items-center gap-1">
+                                                    <FaHashtag size={10}/> Mã đơn: {group.ids[0]}
+                                                </span>
                                             </div>
                                         </div>
 
-                                        {/* Thông tin chi tiết */}
-                                        <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-2xl mb-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-5 rounded-2xl mb-4">
                                             <div>
                                                 <div className="flex items-center gap-2 text-gray-500 text-xs font-bold uppercase mb-1"><FaClock/> Thời gian</div>
-                                                <p className="text-gray-800 font-bold text-lg">
+                                                <p className="text-gray-800 font-bold text-xl tracking-tight">
                                                     {localStartTime.format("HH:mm")} 
                                                     <span className="text-gray-400 mx-2 font-light">⸺</span> 
                                                     {localEndTime.format("HH:mm")}
@@ -308,9 +340,9 @@ const CartPage = () => {
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2 text-gray-500 text-xs font-bold uppercase mb-1"><FaChair/> Bàn đã chọn</div>
-                                                <div className="flex flex-wrap gap-1.5">
+                                                <div className="flex flex-wrap gap-2">
                                                     {group.tableNumbers.map(num => (
-                                                        <span key={num} className="bg-white border border-gray-200 text-gray-700 px-2 py-0.5 rounded-md text-sm font-bold shadow-sm">
+                                                        <span key={num} className="bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm font-bold shadow-sm">
                                                             Bàn {num}
                                                         </span>
                                                     ))}
@@ -318,13 +350,12 @@ const CartPage = () => {
                                             </div>
                                         </div>
 
-                                        {/* Hành động */}
                                         {isReserved && (
                                             <div className="flex justify-end gap-3 pt-2">
-                                                <button onClick={() => openEditModal(group)} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition shadow-sm text-sm">
+                                                <button onClick={() => openEditModal(group)} className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 hover:border-blue-300 hover:text-blue-600 transition shadow-sm text-sm">
                                                     <FaEdit /> Thay đổi
                                                 </button>
-                                                <button onClick={() => handleCancelReservation(group)} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition shadow-sm text-sm">
+                                                <button onClick={() => handleCancelReservation(group)} className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-200 text-red-500 rounded-xl font-bold hover:bg-red-50 hover:border-red-200 transition shadow-sm text-sm">
                                                     <FaTrash /> Hủy bàn
                                                 </button>
                                             </div>
@@ -339,7 +370,6 @@ const CartPage = () => {
         )}
       </div>
 
-      {/* MODAL THANH TOÁN (GIỮ NGUYÊN) */}
       {isPaymentModalOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md animate-fade-in relative">
@@ -349,7 +379,7 @@ const CartPage = () => {
                <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Tên người nhận" onChange={e => setCustomerInfo({...customerInfo, name: e.target.value})} />
                <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Số điện thoại" onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})} />
                <input className="w-full border border-gray-300 p-3.5 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition bg-gray-50 focus:bg-white" placeholder="Địa chỉ giao hàng" onChange={e => setCustomerInfo({...customerInfo, address: e.target.value})} />
-               <textarea className="w-full border border-gray-300 p-3.5 rounded-xl bg-yellow-50 focus:ring-2 focus:ring-yellow-400 outline-none resize-none transition" rows="2" placeholder="Ghi chú món ăn (VD: Không cay...)" onChange={e => setCustomerInfo({...customerInfo, note: e.target.value})} />
+               <textarea className="w-full border border-gray-300 p-3.5 rounded-xl bg-yellow-50 focus:ring-2 focus:ring-yellow-400 outline-none resize-none transition" rows="2" placeholder="Ghi chú món ăn" onChange={e => setCustomerInfo({...customerInfo, note: e.target.value})} />
             </div>
             <div className="grid grid-cols-2 gap-3 mb-6">
                 <button onClick={()=>setPaymentMethod("CASH")} className={`p-3 rounded-xl flex flex-col items-center gap-1 transition border-2 ${paymentMethod==="CASH"?"border-green-500 bg-green-50 text-green-700 font-bold":"border-transparent bg-gray-100 text-gray-600 hover:bg-gray-200"}`}><FaMoneyBillWave size={20}/> Tiền mặt</button>
@@ -366,7 +396,6 @@ const CartPage = () => {
         </div>
       )}
 
-      {/* MODAL SỬA */}
       {isEditModalOpen && editingGroup && (
         <Datban 
             onClose={() => setIsEditModalOpen(false)}
@@ -381,7 +410,6 @@ const CartPage = () => {
         />
       )}
 
-      {/* MODAL ĐẶT MỚI */}
       {isNewBookingModalOpen && (
         <Datban 
             onClose={() => setIsNewBookingModalOpen(false)} 

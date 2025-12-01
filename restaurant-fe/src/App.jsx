@@ -40,6 +40,7 @@ const AdminManageOrders = lazy(() => import('./admin/AdminManageOrders'));
 const AdminManageReservations = lazy(() => import('./admin/AdminManageReservations'));              
 const AdminManageUsers = lazy(() => import('./admin/AdminManageUsers'));
 const AdminManageStaff = lazy(() => import('./admin/AdminManageStaff')); // <--- Import component mới
+const AdminManageReports = lazy(() => import('./admin/AdminManageReports'));
 
 
 function App() {
@@ -63,6 +64,7 @@ function App() {
                   <Route path="reservations" element={<AdminManageReservations />} />
                   <Route path="users" element={<AdminManageUsers />} />
                   <Route path="staff" element={<AdminManageStaff />} />
+                  <Route path="reports" element={<AdminManageReports />} />
                 </Route>
               </Route>
 
