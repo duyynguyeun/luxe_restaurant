@@ -13,6 +13,5 @@ public interface DishService {
     DishResponse updateDish(@PathVariable Long id, @RequestBody DishRequest dishRequest);
     void deleteDish(@PathVariable Long id);
     DishResponse getDishById(@PathVariable Long id);
-    // --- BẠN ĐANG THIẾU DÒNG NÀY ---
     DishResponse toggleDishStatus(Long id);
 }
