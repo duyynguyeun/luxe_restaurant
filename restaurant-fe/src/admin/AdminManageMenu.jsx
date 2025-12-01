@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext'; 
+import { toast } from 'react-toastify';
 import { FaDollarSign, FaTag, FaImage, FaTimes, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaList } from 'react-icons/fa';
+
 
 const AdminManageMenu = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -143,15 +145,15 @@ const AdminManageMenu = () => {
       });
 
       if (response.ok) {
-        alert(isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!');
+        toast.success(isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!');
         setIsModalOpen(false);
         fetchData();
       } else {
-        alert('Lỗi! Mã: ' + response.status);
+        toast.error('Lỗi! Mã: ' + response.status);
       }
     } catch (error) {
       console.error(error);
-      alert('Lỗi kết nối server.');
+      toast.error('Lỗi kết nối server.');
     } finally {
       setIsLoading(false);
     }

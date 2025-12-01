@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const AdminRoute = () => {
   const { currentUser } = useAuth();
@@ -14,7 +15,7 @@ const AdminRoute = () => {
   // Lưu ý: Backend đang trả về "ADMIN" (viết hoa), cần so sánh chính xác
   if (currentUser.role !== 'ADMIN') {
     // Bạn có thể hiện thông báo hoặc không
-    alert("Bạn không có quyền truy cập trang quản trị!"); 
+    toast.error("Bạn không có quyền truy cập trang quản trị!"); 
     return <Navigate to="/" replace />;
   }
 

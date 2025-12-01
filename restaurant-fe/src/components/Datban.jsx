@@ -1,8 +1,9 @@
+// file: restaurant-fe/src/components/Datban.jsx (ĐÃ CẬP NHẬT)
+
 import React from "react";
 import { useState } from "react";
 import { toast } from 'react-toastify';
 import moment from 'moment'; 
-// THÊM ICON FACHAIR
 import { FaChair } from 'react-icons/fa'; 
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -12,45 +13,62 @@ const Datban = ({onClose}) => {
   const [customerName, setCustomerName] = useState(""); 
   const [customerPhone, setCustomerPhone] = useState(""); 
   const [reservationDate, setReservationDate] = useState(moment().format('YYYY-MM-DD')); 
-  const [reservationTime, setReservationTime] = useState("18:00"); 
+  const [startTime, setStartTime] = useState("18:00"); 
+  const [endTime, setEndTime] = useState("20:00");     
   const [partySize, setPartySize] = useState(4); 
   
-  // STATES MỚI CHO CHỌN BÀN
+  // THAY ĐỔI: Sử dụng mảng để lưu nhiều ID bàn đã chọn
   const [availableTables, setAvailableTables] = useState([]); 
-  const [selectedTableId, setSelectedTableId] = useState(""); 
+  const [selectedTableIds, setSelectedTableIds] = useState([]); // Array mới
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false); 
 
   const tang = () => { setPartySize(partySize + 1); }; 
   const giam = () => { setPartySize(Math.max(1, partySize - 1)); }; 
   
-  
+  // --- HÀM CHỌN/BỎ CHỌN NHIỀU BÀN ---
+  const toggleTableSelection = (tableId) => {
+    setSelectedTableIds(prev => {
+        if (prev.includes(tableId)) {
+            return prev.filter(id => id !== tableId); // Bỏ chọn
+        } else {
+            return [...prev, tableId]; // Chọn
+        }
+    });
+  };
+
   // --- HÀM KIỂM TRA BÀN TRỐNG ---
   const checkAvailability = async () => {
     setIsChecking(true);
     setAvailableTables([]); 
-    setSelectedTableId(""); 
+    setSelectedTableIds([]); // Reset các bàn đã chọn
     
-    if (!reservationDate || !reservationTime || partySize < 1) {
-        toast.error("Vui lòng chọn Ngày, Giờ và Số lượng người.");
+    if (!reservationDate || !startTime || !endTime || partySize < 1) {
+        toast.error("Vui lòng chọn Ngày, Giờ Bắt đầu, Giờ Kết thúc và Số lượng người.");
         setIsChecking(false);
         return;
     }
 
     try {
-        const startTimeMoment = moment(`${reservationDate} ${reservationTime}`, 'YYYY-MM-DD HH:mm');
-        const endTimeMoment = startTimeMoment.clone().add(2, 'hours');
+        const startTimeMoment = moment(`${reservationDate} ${startTime}`, 'YYYY-MM-DD HH:mm');
+        const endTimeMoment = moment(`${reservationDate} ${endTime}`, 'YYYY-MM-DD HH:mm');
 
         if (startTimeMoment.isBefore(moment())) {
             toast.error("Không thể đặt bàn trong quá khứ.");
             setIsChecking(false);
             return;
         }
+        
+        if (startTimeMoment.isSameOrAfter(endTimeMoment)) {
+            toast.error("Giờ Kết thúc phải sau Giờ Bắt đầu.");
+            setIsChecking(false);
+            return;
+        }
 
         const startISO = startTimeMoment.toISOString();
-        const endISO = endTimeMoment.toISOString();
+        const endISO = endTimeMoment.toISOString(); 
 
-        // 1. TÌM BÀN TRỐNG (API GET /available)
+        // 1. TÌM TẤT CẢ BÀN TRỐNG (API GET /available)
         const availableRes = await fetch(`${API_URL}/api/reservations/available?start=${startISO}&end=${endISO}`);
         
         if (!availableRes.ok) throw new Error("Lỗi tìm kiếm bàn trống.");
@@ -58,17 +76,17 @@ const Datban = ({onClose}) => {
         const allTables = await availableRes.json();
 
         // 2. Lọc chỉ lấy các bàn đủ chỗ
+        // Chú ý: Ở chế độ đa bàn, ta chỉ lọc các bàn có sức chứa >= 1 (có thể chứa thêm 1 người)
         const suitableTables = allTables
-            .filter(table => table.seats >= partySize)
+            .filter(table => table.seats >= 1) // Lọc tất cả bàn trống (Không còn phụ thuộc vào partySize nữa)
             .sort((a, b) => a.tableNumber - b.tableNumber); 
 
         setAvailableTables(suitableTables);
-        setSelectedTableId(suitableTables.length > 0 ? suitableTables[0].id : ""); // Tự động chọn bàn đầu tiên
         
         if (suitableTables.length === 0) {
-            toast.warning(`Không tìm thấy bàn trống phù hợp cho ${partySize} người.`);
+            toast.warning(`Không tìm thấy bàn trống nào trong khung giờ này.`);
         } else {
-            toast.success(`Tìm thấy ${suitableTables.length} bàn trống. Vui lòng CHỌN BÀN.`);
+            toast.success(`Tìm thấy ${suitableTables.length} bàn trống. Vui lòng CHỌN các bàn bạn muốn đặt.`);
         }
 
     } catch (error) {
@@ -80,37 +98,52 @@ const Datban = ({onClose}) => {
   };
 
 
-  // --- HÀM XỬ LÝ ĐẶT BÀN ---
+  // --- HÀM XỬ LÝ ĐẶT BÀN (LOOP) ---
   const handleBooking = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    if (!customerName || !customerPhone || !selectedTableId) {
-        toast.error("Vui lòng điền Tên, SĐT và CHỌN BÀN.");
-        setIsLoading(false);
+    if (!customerName || !customerPhone || selectedTableIds.length === 0) {
+        toast.error("Vui lòng điền đủ Tên, SĐT và CHỌN ít nhất 1 BÀN.");
         return;
     }
     
+    setIsLoading(true);
+
     try {
-        const startTimeMoment = moment(`${reservationDate} ${reservationTime}`, 'YYYY-MM-DD HH:mm');
-        const endTimeMoment = startTimeMoment.clone().add(2, 'hours');
+        const startTimeMoment = moment(`${reservationDate} ${startTime}`, 'YYYY-MM-DD HH:mm');
+        const endTimeMoment = moment(`${reservationDate} ${endTime}`, 'YYYY-MM-DD HH:mm');
         const startISO = startTimeMoment.toISOString();
         const endISO = endTimeMoment.toISOString();
 
-        // API POST: /api/reservations/book
-        const bookRes = await fetch(
-            `${API_URL}/api/reservations/book?name=${customerName}&phone=${customerPhone}&tableId=${selectedTableId}&start=${startISO}&end=${endISO}`,
-            { method: 'POST' }
-        );
-        
-        if (!bookRes.ok) {
-           const errorText = await bookRes.text();
-           throw new Error(`Đặt bàn thất bại: ${errorText}`);
+        if (startTimeMoment.isSameOrAfter(endTimeMoment)) {
+            toast.error("Giờ Kết thúc phải sau Giờ Bắt đầu.");
+            setIsLoading(false);
+            return;
+        }
+
+        let successfulBookings = 0;
+
+        // BƯỚC QUAN TRỌNG: LẶP QUA TẤT CẢ CÁC BÀN ĐÃ CHỌN VÀ GỌI API ĐẶT BÀN ĐƠN LẺ
+        for (const tableId of selectedTableIds) {
+            const bookRes = await fetch(
+                `${API_URL}/api/reservations/book?name=${customerName}&phone=${customerPhone}&tableId=${tableId}&start=${startISO}&end=${endISO}`,
+                { method: 'POST' }
+            );
+            
+            if (bookRes.ok) {
+                successfulBookings++;
+            } else {
+                console.error(`Lỗi đặt bàn ${tableId}: ${await bookRes.text()}`);
+                // Có thể toast.warning ở đây nếu bạn muốn thông báo lỗi từng bàn
+            }
         }
         
-        const bookedReservation = await bookRes.json();
-        toast.success(`🎉 Đặt bàn thành công! Bàn số ${bookedReservation.table.tableNumber}.`);
-        onClose(); 
+        if (successfulBookings > 0) {
+            toast.success(`🎉 Đặt thành công ${successfulBookings}/${selectedTableIds.length} bàn!`);
+            onClose(); 
+        } else {
+            toast.error("Đặt bàn thất bại hoàn toàn. Vui lòng thử lại.");
+        }
 
     } catch (error) {
       console.error("Lỗi đặt bàn:", error);
@@ -141,7 +174,32 @@ const Datban = ({onClose}) => {
             <div className="font-semibold text-gray-700">Ngày đặt</div>
             <input type="date" value={reservationDate} onChange={(e) => setReservationDate(e.target.value)} className="border rounded px-3 py-2" required />
             
-            {/* Số lượng */}
+            {/* Giờ Bắt đầu & Kết thúc */}
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <div className="font-semibold text-gray-700">Giờ Bắt đầu</div>
+                    <input 
+                        type="time" 
+                        value={startTime} 
+                        onChange={(e) => setStartTime(e.target.value)} 
+                        className="border rounded px-3 py-2 w-full" 
+                        required 
+                    />
+                </div>
+                
+                <div>
+                    <div className="font-semibold text-gray-700">Giờ Kết thúc</div>
+                    <input 
+                        type="time" 
+                        value={endTime} 
+                        onChange={(e) => setEndTime(e.target.value)} 
+                        className="border rounded px-3 py-2 w-full" 
+                        required 
+                    />
+                </div>
+            </div>
+
+            {/* Số lượng người (Vẫn giữ để kiểm tra sức chứa tối thiểu) */}
             <div className="font-semibold text-gray-700">Số lượng người</div>
             <div className="flex items-center">
               <button type="button" onClick={giam} className="bg-gray-200 px-4 py-1 rounded text-lg font-bold cursor-pointer hover:bg-gray-300"> - </button>
@@ -149,9 +207,6 @@ const Datban = ({onClose}) => {
               <button type="button" onClick={tang} className="bg-gray-200 px-3 py-1 rounded text-lg font-bold cursor-pointer hover:bg-gray-300"> + </button>
             </div>
             
-            {/* Thời gian */}
-            <div className="font-semibold text-gray-700">Thời gian</div>
-            <input type="time" value={reservationTime} onChange={(e) => setReservationTime(e.target.value)} className="border rounded px-3 py-2" required />
           </div>
           
           {/* NÚT KIỂM TRA BÀN TRỐNG */}
@@ -166,10 +221,10 @@ const Datban = ({onClose}) => {
             </button>
           </div>
 
-          {/* HIỂN THỊ VÀ CHỌN BÀN (THAY THẾ SELECT BẰNG GRID CARDS) */}
+          {/* HIỂN THỊ VÀ CHỌN BÀN */}
           {availableTables.length > 0 && (
             <div className="border p-3 rounded-lg bg-gray-50 space-y-3">
-                <h4 className="font-bold text-gray-700">Chọn số bàn:</h4>
+                <h4 className="font-bold text-gray-700">Chọn số bàn: <span className="text-sm text-green-600">({selectedTableIds.length} bàn đã chọn)</span></h4>
                 
                 {/* GRID HIỂN THỊ CÁC BÀN */}
                 <div className="grid grid-cols-3 gap-3">
@@ -177,10 +232,10 @@ const Datban = ({onClose}) => {
                         <button
                             key={table.id} 
                             type="button"
-                            onClick={() => setSelectedTableId(table.id)} // Chọn bàn khi click
+                            onClick={() => toggleTableSelection(table.id)} // Cho phép chọn nhiều
                             className={`
                                 flex flex-col items-center p-3 rounded-lg border-2 transition-all 
-                                ${selectedTableId == table.id 
+                                ${selectedTableIds.includes(table.id)
                                     ? 'border-green-600 bg-green-50 shadow-md ring-2 ring-green-500' 
                                     : 'border-gray-300 bg-white hover:bg-gray-100'
                                 }
@@ -208,9 +263,9 @@ const Datban = ({onClose}) => {
               <button 
                 type="submit" 
                 className="flex-1 font-medium bg-green-600 text-white rounded-3xl cursor-pointer hover:bg-green-700 ml-2 py-2 disabled:bg-gray-400"
-                disabled={isLoading || !selectedTableId} // Vô hiệu hóa nếu chưa chọn bàn
+                disabled={isLoading || selectedTableIds.length === 0} // Vô hiệu hóa nếu chưa chọn bàn nào
               >
-                {isLoading ? 'Đang đặt...' : 'ĐẶT BÀN NGAY'}
+                {isLoading ? 'Đang đặt...' : `ĐẶT ${selectedTableIds.length} BÀN`}
               </button>
           </div>
         </form>

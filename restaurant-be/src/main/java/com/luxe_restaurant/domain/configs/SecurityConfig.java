@@ -46,16 +46,13 @@ public class SecurityConfig {
             "/api/user/delete/**",
             "/api/dish/find/**",
             "/api/user/find/**",
-            // THÊM DÒNG NÀY VÀO:
             "/api/dish/toggle/**",
-            "/api/category/**", // <--- THÊM DÒNG NÀY QUAN TRỌNG cho phan danh muc mon
-            "/api/orders/**", // <--- Thêm dòng này cho phan order
+            "/api/category/**", 
+            "/api/orders/**", 
             "/api/images",
             "/api/orders/update-status/**",
             "/api/orders/findOrder/**",
-
             "/api/reservations/**",
-
             "/api/promotion/**",
             "/api/promotion/update/**",
 
