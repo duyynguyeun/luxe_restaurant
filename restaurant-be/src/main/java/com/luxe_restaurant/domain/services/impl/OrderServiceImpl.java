@@ -50,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomerAddress(request.getCustomerAddress());
         order.setTotalPrice(request.getTotalPrice());
         order.setPaymentMethod(request.getPaymentMethod());
+        order.setNote(request.getNote()); // <--- CHỈ CẦN THÊM DÒNG NÀY LÀ XONG
         order.setStatus(OrderStatus.PENDING);
         order.setOrderDate(LocalDateTime.now());
 

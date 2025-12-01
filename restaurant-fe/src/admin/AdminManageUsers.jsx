@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FaTrash, FaEdit, FaUserPlus, FaTimes, FaList } from 'react-icons/fa';
-import { toast } from 'react-toastify'; // Thêm toast để thông báo
+import { FaTrash, FaEdit, FaTimes, FaList } from 'react-icons/fa'; // Đã xóa FaUserPlus
+import { toast } from 'react-toastify'; 
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -11,21 +11,21 @@ const AdminManageUsers = () => {
   const [users, setUsers] = useState([]);
   const { currentUser } = useAuth();
   
-  // State cho Modal (chuyển tên từ isModalOpen sang isFormModalOpen)
+  // State cho Modal
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // Mode: True=Edit, False=Add
+  // isEditing không còn cần thiết vì chỉ có Edit
   const [currentUserId, setCurrentUserId] = useState(null);
 
   const [formData, setFormData] = useState({
     userName: '',
     email: '',
     phone: '',
-    password: '', // Password là tùy chọn khi Edit, bắt buộc khi Add
-    role: 'CUSTOMER'
+    password: '', 
+    role: 'CUSTOMER' 
   });
 
-  // 1. Tải danh sách người dùng
+  // 1. Tải danh sách người dùng (Giữ nguyên)
   const fetchUsers = async () => {
     try {
       const res = await fetch(`${API_URL}/api/user/getall`, {
@@ -56,23 +56,8 @@ const AdminManageUsers = () => {
     }
   };
 
-  // 3. Mở Modal Thêm mới
-  const openAddModal = () => {
-    setIsEditing(false);
-    setCurrentUserId(null);
-    setFormData({
-      userName: '',
-      email: '',
-      phone: '',
-      password: '',
-      role: 'CUSTOMER'
-    });
-    setIsFormModalOpen(true);
-  };
-
-  // 4. Mở Modal Sửa
+  // 3. Mở Modal Sửa (Chỉ còn chức năng Edit)
   const openEditModal = (user) => {
-    setIsEditing(true);
     setCurrentUserId(user.id);
     setFormData({
       userName: user.userName,
@@ -84,50 +69,44 @@ const AdminManageUsers = () => {
     setIsFormModalOpen(true);
   };
 
-  // 5. Xử lý Submit (Thêm mới / Chỉnh sửa)
+  // 4. Xử lý Submit (LUÔN LUÔN LÀ UPDATE)
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (!isEditing && !formData.password) {
-        toast.error("Vui lòng nhập mật khẩu khi thêm mới.");
-        setIsLoading(false);
-        return;
-    }
-    
-    // Chuẩn bị payload (loại bỏ password nếu là Edit và trường đó trống)
-    const payload = {...formData};
-    if (isEditing && payload.password === '') {
-        delete payload.password; // Không gửi mật khẩu nếu không có thay đổi
-    } else if (isEditing && payload.password !== '' && payload.password.length < 6) {
+    // Kiểm tra mật khẩu (Sử dụng logic validation đã sửa trong UserService)
+    if (formData.password !== '' && formData.password.length < 6) {
         toast.error("Mật khẩu mới phải có ít nhất 6 ký tự.");
         setIsLoading(false);
         return;
     }
+    
+    // Chuẩn bị payload (loại bỏ password nếu trống)
+    const payload = {...formData};
+    if (payload.password === '') {
+        delete payload.password;
+    }
 
     try {
-        const url = isEditing 
-            ? `${API_URL}/api/user/update/${currentUserId}`
-            : `${API_URL}/api/user/create`;
-        const method = isEditing ? 'PUT' : 'POST';
+        const url = `${API_URL}/api/user/update/${currentUserId}`; // LUÔN LUÔN LÀ UPDATE
+        const method = 'PUT';
 
         const response = await fetch(url, {
             method: method,
             headers: {
               'Content-Type': 'application/json',
-              // Cần Token cho cả POST và PUT
               'Authorization': `Bearer ${currentUser.token}` 
             },
             body: JSON.stringify(payload)
         });
 
         if (response.ok) {
-            toast.success(isEditing ? 'Cập nhật người dùng thành công!' : 'Thêm mới người dùng thành công!');
+            toast.success('Cập nhật người dùng thành công!');
             setIsFormModalOpen(false);
-            fetchUsers(); // Tải lại danh sách
+            fetchUsers();
         } else {
             const errorText = await response.text();
-            toast.error(errorText || (isEditing ? 'Lỗi khi cập nhật.' : 'Lỗi khi thêm mới.'));
+            toast.error(errorText || 'Lỗi khi cập nhật.');
         }
 
     } catch (error) {
@@ -144,9 +123,7 @@ const AdminManageUsers = () => {
         <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
             <FaList/> Quản lý Người dùng
         </h2>
-        <button onClick={openAddModal} className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 shadow-md flex items-center gap-2 transition-transform active:scale-95">
-          <FaUserPlus className='mr-1'/> Thêm người dùng
-        </button>
+        {/* NÚT "THÊM NGƯỜI DÙNG" ĐÃ BỊ XÓA */}
       </div>
       
       <div className="overflow-x-auto">
@@ -177,7 +154,6 @@ const AdminManageUsers = () => {
                   </span>
                 </td>
                 <td className="p-3 text-center flex justify-center gap-3">
-                  {/* Thay nút cũ bằng nút Edit tổng hợp */}
                   <button onClick={() => openEditModal(user)} className="text-blue-500 hover:bg-blue-50 p-2 rounded-full" title="Sửa thông tin">
                     <FaEdit />
                   </button>
@@ -191,13 +167,13 @@ const AdminManageUsers = () => {
         </table>
       </div>
 
-      {/* MODAL THÊM/SỬA NGƯỜI DÙNG */}
+      {/* MODAL SỬA NGƯỜI DÙNG */}
       {isFormModalOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
             <button onClick={() => setIsFormModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500"><FaTimes size={24} /></button>
             <h3 className="text-2xl font-bold mb-6 text-gray-800 text-center">
-                {isEditing ? `Sửa Người dùng #${currentUserId}` : 'Thêm Người dùng mới'}
+                Sửa Người dùng #{currentUserId}
             </h3>
             
             <form onSubmit={handleFormSubmit} className="space-y-4">
@@ -215,19 +191,18 @@ const AdminManageUsers = () => {
                 />
               </div>
 
-              {/* Email */}
+              {/* Email (Không cho phép sửa) */}
               <div>
                 <label className="block text-sm font-semibold mb-1">Email</label>
                 <input 
                   type="email" 
                   name="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none"
                   required
-                  disabled={isEditing} // Không cho phép sửa Email khi đang Edit
+                  readOnly
                 />
-                {isEditing && <p className="text-xs text-gray-500 mt-1">Không thể đổi Email sau khi tạo.</p>}
+                <p className="text-xs text-gray-500 mt-1">Không thể đổi Email sau khi tạo.</p>
               </div>
 
               {/* SĐT */}
@@ -246,7 +221,7 @@ const AdminManageUsers = () => {
               {/* Mật khẩu */}
               <div>
                 <label className="block text-sm font-semibold mb-1">
-                    Mật khẩu {isEditing ? '(Để trống nếu không đổi)' : '*'}
+                    Mật khẩu (Để trống nếu không đổi)
                 </label>
                 <input 
                   type="password" 
@@ -254,8 +229,7 @@ const AdminManageUsers = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({...formData, password: e.target.value})}
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  placeholder={isEditing ? 'Nhập mật khẩu mới...' : 'Nhập mật khẩu...'}
-                  required={!isEditing}
+                  placeholder='Nhập mật khẩu mới...'
                 />
               </div>
 
@@ -280,7 +254,7 @@ const AdminManageUsers = () => {
                 className="w-full bg-green-600 text-white py-3 mt-6 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:bg-gray-400"
                 disabled={isLoading}
               >
-                {isLoading ? 'Đang xử lý...' : isEditing ? 'Lưu thay đổi' : 'Thêm người dùng'}
+                {isLoading ? 'Đang xử lý...' : 'Lưu thay đổi'}
               </button>
             </form>
           </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify'; // Thêm thư viện thông báo
+import { toast } from 'react-toastify'; 
 
 const MyOrders = () => {
   const { currentUser } = useAuth();
@@ -23,13 +23,11 @@ const MyOrders = () => {
 
   // --- HÀM XỬ LÝ HỦY ĐƠN HÀNG ---
   const handleCancelOrder = async (orderId) => {
-    // Hỏi xác nhận trước khi hủy
     if (!window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?")) {
       return;
     }
 
     try {
-      // Gọi API update status thành CANCELLED
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/orders/update-status/${orderId}?status=CANCELLED`, 
         { method: 'PUT' }
@@ -37,7 +35,7 @@ const MyOrders = () => {
 
       if (response.ok) {
         toast.success("Đã hủy đơn hàng thành công!");
-        fetchOrders(); // Tải lại danh sách để cập nhật trạng thái
+        fetchOrders(); // Tải lại danh sách
       } else {
         toast.error("Lỗi khi hủy đơn hàng.");
       }
@@ -74,7 +72,6 @@ const MyOrders = () => {
                   <p className="text-sm text-gray-500">{new Date(order.orderDate).toLocaleString()}</p>
                 </div>
                 
-                {/* Badge trạng thái */}
                 <span className={`px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
                     order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
                     order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
@@ -86,6 +83,18 @@ const MyOrders = () => {
                    order.status === 'COMPLETED' ? 'Hoàn thành' : order.status}
                 </span>
               </div>
+
+              {/* --- PHẦN HIỂN THỊ GHI CHÚ (NOTE) --- */}
+              {order.note && (
+                <div className="mb-4 bg-yellow-50 border border-yellow-200 p-3 rounded-lg flex items-start gap-2">
+                    <span className="text-lg">📝</span>
+                    <div>
+                        <span className="text-sm font-bold text-gray-700">Ghi chú của bạn:</span>
+                        <p className="text-sm text-gray-600 italic mt-1">{order.note}</p>
+                    </div>
+                </div>
+              )}
+              {/* ------------------------------------ */}
               
               {/* Danh sách món ăn */}
               <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
