@@ -31,6 +31,24 @@ const Signup = () => {
         return;
     }
     
+// --- THÊM VALIDATION MỚI ---
+    const phoneRegex = /^0\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+        const msg = 'Số điện thoại không hợp lệ! Phải đủ 10 số và bắt đầu bằng số 0.';
+        setError(msg);
+        toast.warning(msg);
+        return;
+    }
+
+    // Regex: Tối thiểu 6 ký tự, có ít nhất 1 chữ và 1 số
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        const msg = 'Mật khẩu yếu! Cần tối thiểu 8 ký tự, bao gồm cả chữ và số.';
+        setError(msg);
+        toast.warning(msg);
+        return;
+    }
+
     setIsLoading(true);
 
     try {

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PromotionServiceImpl implements PromotionService {
@@ -48,4 +50,25 @@ public class PromotionServiceImpl implements PromotionService {
 
         return modelMapper.map(promotion, PromotionResponse.class);
     }
+
+    @Override
+    public void deletePromotion(Long id){
+        promotionRepository.deleteById(id);
+    }
+
+    @Override
+    public List<PromotionResponse> getAllPromotions() {
+        return promotionRepository.findAll()
+                .stream()
+                .map(promotion -> PromotionResponse.builder()
+                        .id(promotion.getId())
+                        .title(promotion.getTitle())
+                        .imageUrl(promotion.getImageUrl())
+                        .description(promotion.getDescription())
+                        .createdAt(promotion.getCreatedAt())
+                        .build()
+                )
+                .toList();
+    }
+
 }

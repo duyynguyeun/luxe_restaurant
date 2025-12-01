@@ -48,6 +48,22 @@ const ProfilePage = () => {
   // 3. Gọi API Update
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // --- THÊM VALIDATION MỚI ---
+    const phoneRegex = /^0\d{9}$/;
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+        toast.warning('Số điện thoại không hợp lệ! Phải đủ 10 số và bắt đầu bằng số 0.');
+        return;
+    }
+
+    // Kiểm tra mật khẩu (chỉ khi người dùng có nhập vào ô mật khẩu mới)
+    if (formData.password) {
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(formData.password)) {
+            toast.warning('Mật khẩu mới yếu! Cần tối thiểu 8 ký tự, bao gồm cả chữ và số.');
+            return;
+        }
+    }
+    // ----------------------------
     setIsLoading(true);
 
     try {
