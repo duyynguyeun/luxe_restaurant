@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthContext"; // Provider cho Đăng nh�
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import LoadingSpinner from "./Loading/LoadingSpinner"; // Đường dẫn file loading
+import OnboardingTour from "./components/OnboardingTour";
 
 // --- THÊM IMPORT NÀY ---
 import AdminRoute from "./components/AdminRoute";
@@ -52,6 +53,7 @@ function App() {
           {/* 7. BỌC SUSPENSE */}
           <Suspense fallback={<LoadingSpinner />}>
             <ToastContainer position="top-right" autoClose={3000} />
+            <OnboardingTour />
             <Routes>
               
               {/* Nhóm 1: Các trang ADMIN (ĐƯỢC BẢO VỆ) */}

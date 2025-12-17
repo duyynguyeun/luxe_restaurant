@@ -1,76 +1,97 @@
 import React from "react";
-import { Facebook, Instagram, Phone, Mail, MapPin } from "lucide-react";
+import { Facebook, Instagram, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#174C34] text-white py-12 mt-10 border-t-4 border-yellow-500">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    // THAY ĐỔI: Sử dụng Gradient đồng bộ với Header nhưng thêm padding lớn hơn để thoáng (Tươi sáng)
+    <footer className="relative bg-gradient-to-r from-[#051810] via-[#174C34] to-[#051810] text-white pt-16 pb-8 mt-10 font-sans">
+      
+      {/* Hiệu ứng đường viền sáng (Glow Line) ở mép trên tạo cảm giác sang trọng, tươi sáng */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-70"></div>
+
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
         
         {/* Cột 1: Logo + Giới thiệu */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 font-serif text-yellow-400">
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold font-serif text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500">
             Luxe Restaurant
           </h2>
-          <p className="text-sm text-gray-300 leading-relaxed text-justify">
-            Nơi hội tụ tinh hoa ẩm thực Việt trong không gian sang trọng và ấm cúng. Chúng tôi cam kết mang đến những trải nghiệm hương vị khó quên từ nguyên liệu tươi ngon nhất.
+          <p className="text-gray-300 text-sm leading-relaxed text-justify opacity-90">
+            Hành trình đánh thức vị giác với tinh hoa ẩm thực Việt trong không gian kiến trúc đương đại. Chúng tôi kiến tạo những khoảnh khắc đáng nhớ bằng sự tận tâm và hương vị tuyệt hảo.
           </p>
+          <div className="flex gap-4">
+            <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-amber-500 hover:text-[#174C34] transition-all duration-300 transform hover:-translate-y-1 border border-white/10">
+              <Facebook size={18}/>
+            </a>
+            <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-amber-500 hover:text-[#174C34] transition-all duration-300 transform hover:-translate-y-1 border border-white/10">
+              <Instagram size={18}/>
+            </a>
+          </div>
         </div>
 
         {/* Cột 2: Liên kết nhanh */}
         <div>
-          <h3 className="text-lg font-bold mb-4 text-white uppercase tracking-wider">Khám phá</h3>
-          <ul className="space-y-2 text-sm text-gray-300">
-            <li><a href="/" className="hover:text-yellow-400 hover:translate-x-1 transition-transform inline-block">Trang chủ</a></li>
-            <li><a href="/menu" className="hover:text-yellow-400 hover:translate-x-1 transition-transform inline-block">Thực đơn đặc sắc</a></li>
-            <li><a href="/contactPage" className="hover:text-yellow-400 hover:translate-x-1 transition-transform inline-block">Đặt bàn & Liên hệ</a></li>
-            <li><a href="/my-orders" className="hover:text-yellow-400 hover:translate-x-1 transition-transform inline-block">Lịch sử đơn hàng</a></li>
+          <h3 className="text-lg font-bold mb-6 text-amber-300 uppercase tracking-widest text-sm">Khám phá</h3>
+          <ul className="space-y-4">
+            {['Trang chủ', 'Thực đơn đặc sắc', 'Đặt bàn & Liên hệ', 'Lịch sử đơn hàng'].map((item, index) => (
+              <li key={index}>
+                <a 
+                  href={index === 0 ? "/" : index === 1 ? "/menu" : index === 2 ? "/contactPage" : "/my-orders"} 
+                  className="group flex items-center gap-2 text-gray-400 hover:text-amber-300 transition-colors duration-300"
+                >
+                  <ArrowRight size={14} className="opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 text-amber-500" />
+                  {item}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
 
         {/* Cột 3: Thông tin liên hệ */}
         <div>
-          <h3 className="text-lg font-bold mb-4 text-white uppercase tracking-wider">Liên hệ</h3>
-          <ul className="space-y-4 text-sm text-gray-300">
-            <li className="flex items-start gap-3">
-              <MapPin size={18} className="mt-0.5 text-yellow-400 shrink-0"/>
-              <span>136 Xuân Thủy, Cầu Giấy, Hà Nội</span>
+          <h3 className="text-lg font-bold mb-6 text-amber-300 uppercase tracking-widest text-sm">Liên hệ</h3>
+          <ul className="space-y-5 text-sm text-gray-300">
+            <li className="flex items-start gap-4 group">
+              <div className="p-2 bg-white/5 rounded-full text-amber-400 group-hover:bg-amber-500 group-hover:text-[#174C34] transition-colors">
+                <MapPin size={18} />
+              </div>
+              <span className="mt-1">136 Xuân Thủy, Cầu Giấy, Hà Nội</span>
             </li>
-            <li className="flex items-center gap-3">
-              <Phone size={18} className="text-yellow-400 shrink-0"/>
-              <span className="font-bold text-lg text-white">1900 1986</span>
+            <li className="flex items-center gap-4 group">
+               <div className="p-2 bg-white/5 rounded-full text-amber-400 group-hover:bg-amber-500 group-hover:text-[#174C34] transition-colors">
+                <Phone size={18} />
+              </div>
+              <span className="font-bold text-lg text-white group-hover:text-amber-300 transition-colors">1900 1986</span>
             </li>
-            <li className="flex items-center gap-3">
-              <Mail size={18} className="text-yellow-400 shrink-0"/>
-              <span>contact@luxe-group.com</span>
+            <li className="flex items-center gap-4 group">
+               <div className="p-2 bg-white/5 rounded-full text-amber-400 group-hover:bg-amber-500 group-hover:text-[#174C34] transition-colors">
+                <Mail size={18} />
+              </div>
+              <span className="group-hover:text-amber-300 transition-colors">contact@luxe-group.com</span>
             </li>
           </ul>
-          {/* Mạng xã hội */}
-          <div className="flex gap-4 mt-6">
-            <a href="#" className="bg-white/10 p-2.5 rounded-full hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1"><Facebook size={20}/></a>
-            <a href="#" className="bg-white/10 p-2.5 rounded-full hover:bg-pink-600 hover:text-white transition-all transform hover:-translate-y-1"><Instagram size={20}/></a>
-          </div>
         </div>
 
-        {/* Cột 4: Bản đồ (ĐÃ CẬP NHẬT ĐỊA CHỈ THẬT) */}
-        <div className="h-56 lg:h-auto rounded-xl overflow-hidden shadow-lg border-2 border-white/20 relative group">
-          {/* Iframe nhúng bản đồ 136 Xuân Thủy */}
+        {/* Cột 4: Bản đồ */}
+        <div className="relative group rounded-2xl overflow-hidden border border-white/10 shadow-2xl h-64 lg:h-auto">
           <iframe 
-            src="https://maps.google.com/maps?q=136%20Xuân%20Thủy%2C%20Cầu%20Giấy%2C%20Hà%20Nội&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.8638558814587!2d105.78073067503173!3d21.038132787455855!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab354920c233%3A0x5d0313a3bfdc4f37!2zxJDhuqFpIGjhu41jIFF14buRYyBHaWEgSMOgIE7huqlp!5e0!3m2!1svi!2s!4v1700000000000!5m2!1svi!2s" 
             width="100%" 
             height="100%" 
-            style={{ border: 0 }} 
+            style={{ border: 0, filter: 'grayscale(20%) contrast(1.2) opacity(0.8)' }} 
             allowFullScreen="" 
             loading="lazy"
-            title="Bản đồ 136 Xuân Thủy"
-            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+            title="Bản đồ"
+            className="w-full h-full object-cover transition-all duration-500 group-hover:filter-none group-hover:opacity-100 group-hover:scale-105"
           ></iframe>
           
-          {/* Nút chỉ đường - Mở sang Google Maps App/Web */}
+          <div className="absolute inset-0 pointer-events-none border-4 border-white/10 rounded-2xl group-hover:border-amber-400/30 transition-colors duration-500"></div>
+          
           <a 
-            href="https://www.google.com/maps/search/?api=1&query=136+Xuân+Thủy,+Cầu+Giấy,+Hà+Nội" 
+            href="https://goo.gl/maps/xyz" // Thay link thật của bạn
             target="_blank" 
             rel="noreferrer"
-            className="absolute bottom-3 right-3 bg-white text-[#174C34] text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:bg-yellow-400 hover:text-black transition transform hover:-translate-y-1 flex items-center gap-1"
+            className="absolute bottom-4 right-4 bg-amber-500 text-[#174C34] text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:bg-white hover:text-amber-600 transition-all duration-300 flex items-center gap-2 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100"
           >
             <MapPin size={14} /> Chỉ đường
           </a>
@@ -78,9 +99,13 @@ const Footer = () => {
 
       </div>
 
-      {/* Bản quyền */}
-      <div className="border-t border-white/10 mt-12 pt-6 text-center text-xs text-gray-400">
+      {/* Copyright */}
+      <div className="max-w-7xl mx-auto px-6 mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
         <p>© {new Date().getFullYear()} Luxe Restaurant Group. All rights reserved.</p>
+        <div className="flex gap-6 mt-2 md:mt-0">
+          <a href="#" className="hover:text-amber-300 transition-colors">Điều khoản sử dụng</a>
+          <a href="#" className="hover:text-amber-300 transition-colors">Chính sách bảo mật</a>
+        </div>
       </div>
     </footer>
   );

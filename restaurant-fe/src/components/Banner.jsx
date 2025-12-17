@@ -1,43 +1,59 @@
 import React, { useState } from "react";
-import Datban from "./Datban"
+import Datban from "./Datban";
 
+const Banner = () => {
+  const [openForm, setOpenForm] = useState(false); // Giữ nguyên logic quản lý trạng thái
 
-const Banner = (onOpenDatBan) => {
-  const [openForm, setOpenForm] = useState(false); // quản lý trạng thái mở form
   return (
     <section
       className="relative h-screen bg-cover bg-center flex items-center justify-center"
       style={{
+        // Đã thay đổi sang ảnh nhà hàng sang trọng (tông đèn vàng ấm cúng)
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1600&q=80')",
+          "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80')",
       }}
     >
-      {/* Lớp phủ mờ để chữ dễ đọc */}
-      <div className="absolute inset-0 bg-black/50"></div>
+      {/* Lớp phủ Gradient đen để làm nổi bật chữ và tạo chiều sâu sang trọng */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
 
-      {/* Nội dung */}
-      <div className="relative z-10 text-center text-white px-4">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-          Nơi Ẩm Thực Hội Tụ Tinh Hoa
+      {/* Nội dung chính */}
+      <div className="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
+        <span className="block text-amber-400 font-medium tracking-[0.2em] mb-4 uppercase text-sm md:text-base animate-fade-in-up">
+          Chào mừng đến với Luxe Restaurant
+        </span>
+        
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight drop-shadow-2xl font-serif">
+          Tinh Hoa Ẩm Thực <br /> 
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500">
+            Đẳng Câp Thượng Lưu
+          </span>
         </h1>
-        <p className="text-lg md:text-2xl mb-8">
-          Trải nghiệm không gian ấm cúng & món ăn đẳng cấp
+        
+        <p className="text-gray-200 text-lg md:text-2xl mb-10 font-light max-w-2xl mx-auto border-t border-b border-white/20 py-4">
+          Trải nghiệm không gian nghệ thuật và hương vị tuyệt hảo đánh thức mọi giác quan.
         </p>
 
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
+          {/* Nút Đặt bàn: Màu Amber sang trọng */}
           <button
             onClick= {() => setOpenForm(true)} 
-            className="bg-green-800 hover:bg-yellow-400 cursor-pointer text-white px-6 py-3 rounded-full font-semibold shadow-lg transition"
+            // Thêm class tour-booking
+            className="tour-booking bg-green-800 hover:bg-yellow-400 cursor-pointer text-white px-6 py-3 rounded-full font-semibold shadow-lg transition"
           >
             Đặt bàn ngay
           </button>
+
+          {/* Nút Menu: Hiệu ứng kính mờ (Glassmorphism) */}
           <a href="/Menu">
-            <button className="bg-white/80 hover:bg-white cursor-pointer text-black px-6 py-3 rounded-full font-semibold shadow-lg transition">
-              Xem Menu
-            </button></a>
+            <button className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-full font-bold tracking-wider uppercase text-sm hover:bg-white hover:text-black transition-all duration-300 shadow-lg">
+              Khám phá Thực đơn
+            </button>
+          </a>
         </div>
       </div>
-      {openForm && <Datban onClose={() => setOpenForm(false)}/>}
+
+      {/* Logic mở form đặt bàn giữ nguyên */}
+      {openForm && <Datban onClose={() => setOpenForm(false)} />}
     </section>
   );
 };

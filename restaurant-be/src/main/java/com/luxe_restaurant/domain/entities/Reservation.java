@@ -23,6 +23,10 @@ public class Reservation {
     @JoinColumn(name = "table_id")
     private RestaurantTable table;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard = () => {
-  // State lưu số liệu thống kê
   const [stats, setStats] = useState({
     totalDishes: 0,
     ordersToday: 0,
@@ -14,29 +13,24 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // 1. Lấy danh sách món ăn
         const dishRes = await fetch(`${import.meta.env.VITE_API_URL}/api/dish/getall`);
         const dishes = dishRes.ok ? await dishRes.json() : [];
 
-        // 2. Lấy danh sách người dùng
         const userRes = await fetch(`${import.meta.env.VITE_API_URL}/api/user/getall`, {
             headers: { 'Authorization': `Bearer ${currentUser?.token}` }
         });
         const users = userRes.ok ? await userRes.json() : [];
 
-        // 3. Lấy danh sách đơn hàng
         const orderRes = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/getall`, {
             headers: { 'Authorization': `Bearer ${currentUser?.token}` }
         });
         const orders = orderRes.ok ? await orderRes.json() : [];
 
-        // 4. Tính toán số lượng đơn "Hôm nay"
-        const todayStr = new Date().toISOString().split('T')[0]; // Lấy ngày YYYY-MM-DD
+        const todayStr = new Date().toISOString().split('T')[0];
         const countOrdersToday = orders.filter(order => 
             order.orderDate && order.orderDate.startsWith(todayStr)
         ).length;
 
-        // 5. Cập nhật State
         setStats({
           totalDishes: dishes.length,
           totalUsers: users.length,
@@ -49,71 +43,99 @@ const AdminDashboard = () => {
     };
 
     fetchDashboardData();
-  }, [currentUser]); // Chạy lại khi user thay đổi
+  }, [currentUser]);
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg min-h-[80vh]">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Dashboard</h2>
+    <div className="space-y-8 fade-in-up"> {/* Thêm animation class nếu có */}
       
-      <div className="mb-8">
-        <p className="text-xl text-gray-700">
-          Xin chào, <span className="font-bold text-green-700">{currentUser?.username || 'Admin'}</span>! 👋
-        </p>
-        <p className="text-gray-500 mt-1">
-          Đây là tổng quan tình hình hoạt động của nhà hàng hôm nay.
-        </p>
+      {/* Banner chào mừng */}
+      <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        <div className="relative z-10">
+            <h2 className="text-3xl font-bold mb-2">Xin chào, {currentUser?.username || 'Admin'}! 👋</h2>
+            <p className="text-orange-100 text-lg opacity-90">
+            Chúc bạn một ngày làm việc hiệu quả. Dưới đây là tổng quan nhà hàng hôm nay.
+            </p>
+        </div>
+        {/* Decor background circles */}
+        <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 rounded-full bg-white opacity-10"></div>
+        <div className="absolute bottom-0 right-20 -mb-10 w-24 h-24 rounded-full bg-white opacity-10"></div>
       </div>
 
       {/* Grid Thống kê */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        {/* Thẻ Món ăn */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <StatCard 
-          title="TỔNG SỐ MÓN ĂN" 
+          title="Tổng số món ăn" 
           value={stats.totalDishes} 
-          color="blue"
+          type="dish"
           icon="🍔"
         />
 
-        {/* Thẻ Đơn hàng */}
         <StatCard 
-          title="ĐƠN HÀNG HÔM NAY" 
+          title="Đơn hàng hôm nay" 
           value={stats.ordersToday} 
-          color="green"
+          type="order"
           icon="📄"
         />
 
-        {/* Thẻ Người dùng */}
         <StatCard 
-          title="TỔNG NGƯỜI DÙNG" 
+          title="Tổng khách hàng" 
           value={stats.totalUsers} 
-          color="yellow"
+          type="user"
           icon="👥"
         />
+      </div>
+
+      {/* Có thể thêm khu vực biểu đồ hoặc danh sách mới nhất ở đây sau này */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 min-h-[300px] flex items-center justify-center text-slate-400">
+         <p>Khu vực biểu đồ doanh thu (Coming Soon)</p>
       </div>
     </div>
   );
 };
 
-// Component con hiển thị thẻ (đã làm đẹp hơn)
-const StatCard = ({ title, value, color, icon }) => {
-  // Map màu sắc
-  const colors = {
-    blue: 'bg-blue-50 border-blue-200 text-blue-800',
-    green: 'bg-green-50 border-green-200 text-green-800',
-    yellow: 'bg-yellow-50 border-yellow-200 text-yellow-800'
+// Component Card được thiết kế lại theo phong cách hiện đại
+const StatCard = ({ title, value, type, icon }) => {
+  
+  // Định nghĩa style cho từng loại thẻ
+  const styles = {
+    dish: {
+      bgIcon: 'bg-blue-100',
+      textIcon: 'text-blue-600',
+      borderBot: 'border-b-blue-500' // Dùng nếu muốn border bottom
+    },
+    order: {
+      bgIcon: 'bg-green-100',
+      textIcon: 'text-green-600',
+      borderBot: 'border-b-green-500'
+    },
+    user: {
+      bgIcon: 'bg-purple-100',
+      textIcon: 'text-purple-600',
+      borderBot: 'border-b-purple-500'
+    }
   };
 
+  const style = styles[type] || styles.dish;
+
   return (
-    <div className={`p-6 rounded-xl border-l-4 shadow-sm hover:shadow-md transition-shadow ${colors[color].replace('text', 'border')}`}>
+    <div className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-gray-500 font-semibold uppercase text-xs tracking-wider">{title}</h3>
-          <p className={`text-4xl font-bold mt-2 ${colors[color].split(' ')[2]}`}>
+          <h3 className="text-slate-500 font-medium text-sm uppercase tracking-wider mb-1">{title}</h3>
+          <p className="text-4xl font-extrabold text-slate-800 group-hover:scale-105 transition-transform origin-left">
             {value}
           </p>
         </div>
-        <div className="text-3xl opacity-50">{icon}</div>
+        <div className={`w-14 h-14 rounded-2xl ${style.bgIcon} flex items-center justify-center text-2xl shadow-inner`}>
+          <span className={style.textIcon}>{icon}</span>
+        </div>
+      </div>
+      
+      <div className="mt-4 flex items-center text-xs text-slate-400 font-medium">
+         <span className="text-green-500 mr-1 flex items-center">
+            ↑ Cập nhật
+         </span>
+         <span>vừa xong</span>
       </div>
     </div>
   );
