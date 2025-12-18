@@ -53,10 +53,10 @@ const Chatbot = () => {
 
   return (
     <>
-      {/* Cửa sổ chat với animation */}
+      {/* Cửa sổ chat */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 animate-slide-up border border-gray-200">
-          {/* Header với gradient */}
+          {/* Header */}
           <div className="bg-gradient-to-r from-[#3ab5b0] via-[#3d99be] to-[#56317a] text-white p-4 flex justify-between items-center rounded-t-2xl">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
@@ -69,14 +69,13 @@ const Chatbot = () => {
             </div>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              // Thêm class tour-chatbot
-              className="tour-chatbot fixed bottom-6 right-6 bg-[#174C34] text-white cursor-pointer w-16 h-16 rounded-full shadow-xl flex items-center justify-center text-3xl z-50 hover:bg-opacity-90 transition-transform hover:scale-110"
+              className="bg-[#174C34] text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-opacity-90 transition-transform"
             >
-              {isOpen ? <FaTimes /> : <FaComments />}
+              <FaTimes />
             </button>
           </div>
 
-          {/* Khung chat với pattern background */}
+          {/* Tin nhắn */}
           <div className="flex-1 p-4 overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
             {messages.map((msg, index) => (
               <div 
@@ -88,17 +87,18 @@ const Chatbot = () => {
                     <FaRobot className="text-white text-sm" />
                   </div>
                 )}
-                <div className={`max-w-[75%] px-4 py-3 rounded-2xl shadow-md ${
-                  msg.sender === 'user' 
-                    ? 'bg-gradient-to-r from-[#3ab5b0] to-[#3d99be] text-white rounded-tr-none' 
-                    : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none'
-                }`}>
+                <div
+                  className={`max-w-[75%] px-4 py-3 rounded-2xl shadow-md ${
+                    msg.sender === 'user'
+                      ? 'bg-gradient-to-r from-[#3ab5b0] to-[#3d99be] text-white rounded-tr-none'
+                      : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none'
+                  }`}
+                >
                   <p className="text-sm leading-relaxed">{msg.text}</p>
                 </div>
               </div>
             ))}
-            
-            {/* Loading animation */}
+
             {isLoading && (
               <div className="flex justify-start mb-4 animate-fade-in">
                 <div className="w-8 h-8 bg-gradient-to-br from-[#3ab5b0] to-[#3d99be] rounded-full flex items-center justify-center mr-2">
@@ -113,10 +113,11 @@ const Chatbot = () => {
                 </div>
               </div>
             )}
+
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Ô nhập liệu với styling đẹp hơn */}
+          {/* Ô nhập */}
           <div className="p-4 border-t border-gray-200 bg-white rounded-b-2xl">
             <div className="flex items-center space-x-2 bg-gray-100 rounded-full p-1">
               <input
@@ -139,47 +140,46 @@ const Chatbot = () => {
         </div>
       )}
 
-      {/* Nút bong bóng chat với hiệu ứng đẹp */}
+      {/* Nút bong bóng chat */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-[#3ab5b0] via-[#3d99be] to-[#56317a] text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-3xl z-50 hover:scale-110 transition-transform duration-300 group"
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-[#3ab5b0] via-[#3d99be] to-[#56317a] text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-3xl z-50 hover:scale-110 transition-transform duration-300"
       >
-        <div className="absolute inset-0 bg-white/20 rounded-full animate-ping opacity-75"></div>
-        <div className="relative">
-          {isOpen ? <FaTimes /> : <FaComments />}
-        </div>
+        {isOpen ? <FaTimes /> : <FaComments />}
       </button>
 
       {/* CSS Animation */}
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
+      <style>
+        {`
+          @keyframes slide-up {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+          
+          @keyframes fade-in {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
           }
-        }
-        
-        @keyframes fade-in {
-          from {
-            opacity: 0;
+          
+          .animate-slide-up {
+            animation: slide-up 0.3s ease-out;
           }
-          to {
-            opacity: 1;
+          
+          .animate-fade-in {
+            animation: fade-in 0.3s ease-out;
           }
-        }
-        
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-      `}</style>
+        `}
+      </style>
     </>
   );
 };

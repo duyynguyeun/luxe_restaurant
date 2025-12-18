@@ -2,6 +2,7 @@ package com.luxe_restaurant.domain.services.impl;
 
 import com.luxe_restaurant.app.requests.order.OrderItemRequest;
 import com.luxe_restaurant.app.requests.order.OrderRequest;
+import com.luxe_restaurant.app.responses.dish.DishSalesResponse;
 import com.luxe_restaurant.domain.entities.Order;
 import com.luxe_restaurant.domain.entities.OrderDetail;
 import com.luxe_restaurant.domain.entities.User;
@@ -15,7 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 @Service
@@ -156,6 +161,36 @@ public class OrderServiceImpl implements OrderService {
 
         userRepository.save(user);
     }
+
+
+    @Override
+    public List<DishSalesResponse> getTopSellingDishes(String type, LocalDate date) {
+        if (date == null) {
+            date = LocalDate.now();
+        }
+
+        LocalDateTime startDate;
+        LocalDateTime endDate;
+
+        switch (type.toLowerCase()) {
+            case "week":
+                startDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).atStartOfDay();
+                endDate   = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).atTime(LocalTime.MAX);
+                break;
+            case "month":
+                startDate = date.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
+                endDate   = date.with(TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
+                break;
+            default:  // day
+                startDate = date.atStartOfDay();
+                endDate   = date.atTime(LocalTime.MAX);
+                break;
+        }
+
+        return orderRepository.findTopSellingDishes(startDate, endDate);
+    }
+
+
 
     // ------------------- Lấy đơn theo user -------------------
     @Override

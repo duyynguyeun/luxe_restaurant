@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import AdminManageReportDish from "./AdminManageReportDish";
 import { useAuth } from '../context/AuthContext';
 
 const AdminDashboard = () => {
@@ -85,10 +86,10 @@ const AdminDashboard = () => {
         />
       </div>
 
-      {/* Có thể thêm khu vực biểu đồ hoặc danh sách mới nhất ở đây sau này */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 min-h-[300px] flex items-center justify-center text-slate-400">
-         <p>Khu vực biểu đồ doanh thu (Coming Soon)</p>
-      </div>
+      {/* ====== NHÚNG BÁO CÁO MÓN ĂN ĐÃ BÁN ====== */}
+      <div className="bg-gray-50 p-6 rounded-2xl shadow-sm border border-slate-100">
+  <AdminManageReportDish />
+</div>
     </div>
   );
 };
