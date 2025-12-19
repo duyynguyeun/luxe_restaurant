@@ -50,7 +50,7 @@ const AdminManageMenu = () => {
     dishName: '',
     price: '',
     urlImage: '',
-    categoryId: '' // ID danh mục
+    categoryId: '' 
   });
 
   // --- Tải dữ liệu ---

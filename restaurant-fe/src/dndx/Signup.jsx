@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; // Thêm toast để thông báo chuyên nghiệp hơn
+import { toast } from 'react-toastify'; 
 
 const Signup = () => {
   // State lưu thông tin người dùng
@@ -9,29 +9,29 @@ const Signup = () => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   
-  // STATE MỚI CHO OTP VÀ STEP
+  
   const [otp, setOtp] = useState('');
-  const [step, setStep] = useState(1); // 1: Nhập thông tin, 2: Nhập OTP
-  const [isLoading, setIsLoading] = useState(false); // Thêm state loading
+  const [step, setStep] = useState(1); 
+  const [isLoading, setIsLoading] = useState(false); 
 
-  // State cho lỗi và navigate
+  
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // --- HÀM 1: GỬI OTP (Chạy khi Submit form Step 1) ---
+ 
   const handleSendOtp = async (e) => {
     e.preventDefault(); 
     setError('');
 
-    // 1. Kiểm tra thông tin cơ bản
+    // Kiểm tra thông tin 
     if (!email || !phone || !userName || !password) {
         setError('Vui lòng điền đầy đủ thông tin đăng ký!');
         return;
     }
     
-// --- THÊM VALIDATION MỚI ---
+// Xử lý điều kiện
     const phoneRegex = /^0\d{9}$/;
     if (!phoneRegex.test(phone)) {
         const msg = 'Số điện thoại không hợp lệ! Phải đủ 10 số và bắt đầu bằng số 0.';
@@ -40,7 +40,7 @@ const Signup = () => {
         return;
     }
 
-    // Regex: Tối thiểu 6 ký tự, có ít nhất 1 chữ và 1 số
+    // Xử lý điều kiện
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(password)) {
         const msg = 'Mật khẩu yếu! Cần tối thiểu 8 ký tự, bao gồm cả chữ và số.';
@@ -52,8 +52,7 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-      // 2. Gọi API /api/user/send-otp
-      // Endpoint: POST /api/user/send-otp?email={email}
+      //  Gọi API /api/user/send-otp
       const response = await fetch(`${API_URL}/api/user/send-otp?email=${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -66,7 +65,7 @@ const Signup = () => {
         return;
       }
 
-      // 3. Gửi OTP thành công -> Chuyển sang bước 2
+      // Gửi OTP thành công -> Chuyển sang bước 2
       toast.success('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra!');
       setStep(2);
 
@@ -80,7 +79,7 @@ const Signup = () => {
   };
 
 
-  // --- HÀM 2: XÁC THỰC OTP VÀ TẠO TÀI KHOẢN (Chạy khi Submit form Step 2) ---
+  // Bước 2: XÁC THỰC OTP VÀ TẠO TÀI KHOẢN
   const handleVerifyAndRegister = async (e) => {
     e.preventDefault(); 
     setError('');
@@ -93,17 +92,15 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-      // 1. Tạo body request khớp với UserCreateRequest.java
       const requestBody = {
         email: email,
         phone: phone,
         userName: userName,
         password: password,
-        role: "CUSTOMER" // Mặc định là CUSTOMER
+        role: "CUSTOMER"
       };
 
       // 2. Gọi API /api/user/verify-otp
-      // Endpoint: POST /api/user/verify-otp?email={email}&otp={otp} (body: UserCreateRequest)
       const response = await fetch(
           `${API_URL}/api/user/verify-otp?email=${email}&otp=${otp}`, 
           {
@@ -114,14 +111,13 @@ const Signup = () => {
       );
 
       if (!response.ok) {
-        // Xử lý lỗi (ví dụ: OTP không đúng, email đã tồn tại)
         const errorData = await response.text();
         setError(errorData || 'Xác thực thất bại');
         toast.error(errorData || 'Xác thực thất bại');
         return;
       }
 
-      // 3. Đăng ký thành công, chuyển về trang đăng nhập
+     
       toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
       navigate('/login');
 
@@ -142,7 +138,7 @@ const Signup = () => {
         
         {error && <p className="text-red-500 text-center my-3">{error}</p>}
 
-        {/* --- STEP 1: NHẬP THÔNG TIN --- */}
+        {/*  STEP 1: NHẬP THÔNG TIN  */}
         {step === 1 && (
             <form className='space-y-5' onSubmit={handleSendOtp}>
               <div>
@@ -201,7 +197,7 @@ const Signup = () => {
             </form>
         )}
 
-        {/* --- STEP 2: NHẬP OTP --- */}
+        {/* STEP 2: NHẬP OTP  */}
         {step === 2 && (
             <form className='space-y-5' onSubmit={handleVerifyAndRegister}>
                 <p className='text-sm text-center text-gray-600 border-b pb-4'>

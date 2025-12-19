@@ -9,7 +9,7 @@ const AdminManageOrders = () => {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/getall`);
       if (res.ok) {
         const data = await res.json();
-        setOrders(data.reverse()); // Đơn mới nhất lên đầu
+        setOrders(data.reverse()); 
       }
     } catch (err) { 
       console.error(err); 

@@ -31,7 +31,7 @@ const AdminManageReports = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Xóa phản hồi này?")) return;
     try {
-      // Backend đang dùng @DeleteMapping("/delete") với tham số ?id=...
+      
       const res = await fetch(`${API_URL}/api/report/delete?id=${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${currentUser.token}` }

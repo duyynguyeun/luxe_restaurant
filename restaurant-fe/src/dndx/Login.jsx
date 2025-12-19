@@ -1,12 +1,12 @@
 import React, { useState } from 'react';  
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // 1. Import hook của chúng ta
+import { useAuth } from '../context/AuthContext'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth(); // 2. Lấy hàm login "giả"
+  const { login } = useAuth(); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -18,11 +18,11 @@ const Login = () => {
 
     if (userData) {
       // Kiểm tra quyền (Role)
-      // Lưu ý: Role phải khớp với Enum trong Backend (ADMIN, CUSTOMER, STAFF...)
+
       if (userData.role === 'ADMIN') {
-        navigate('/admin'); // Nếu là Admin -> Vào trang quản trị
+        navigate('/admin'); 
       } else {
-        navigate('/');      // Nếu là Khách/Nhân viên -> Về trang chủ
+        navigate('/');      
       }
     } else {
       setError('Tên đăng nhập hoặc mật khẩu không đúng.');

@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                 // 2. THÊM DÒNG NÀY ĐỂ SỬA LỖI CORS
+                        .requestMatchers("/api/auth/**", "/ws/**").permitAll() // Thêm /ws/** vào đây
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(WHITE_LIST).permitAll()
                         .anyRequest().authenticated()

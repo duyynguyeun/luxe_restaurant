@@ -12,8 +12,10 @@ const Header = () => {
     logout();
     navigate("/login");
   }
-
+  
   return (
+    
+  
     <header className="bg-[#174C34] shadow-md sticky top-0 z-50 font-sans">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
