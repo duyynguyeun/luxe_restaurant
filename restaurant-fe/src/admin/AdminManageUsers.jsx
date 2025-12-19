@@ -134,7 +134,7 @@ const AdminManageUsers = () => {
               <th className="p-3 text-left">Tên</th>
               <th className="p-3 text-left">Email</th>
               <th className="p-3 text-left">SĐT</th>
-              <th className="p-3 text-center">Quyền</th>
+              <th className="p-3 text-center">Vai trò</th>
               <th className="p-3 text-center">Hành động</th>
             </tr>
           </thead>

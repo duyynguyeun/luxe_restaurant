@@ -5,8 +5,9 @@ import com.luxe_restaurant.domain.entities.RestaurantTable;
 import com.luxe_restaurant.domain.enums.ReservationStatus;
 import com.luxe_restaurant.domain.enums.TableStatus;
 import com.luxe_restaurant.domain.repositories.ReservationRepository;
-import com.luxe_restaurant.domain.repositories.RestaurantTableRepository;
+import com.luxe_restaurant.domain.repositories.RestaurantTableeRepository;
 import com.luxe_restaurant.domain.services.ReservationService;
+import com.luxe_restaurant.domain.services.mail.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
 
-    private final RestaurantTableRepository tableRepo;
+    private final RestaurantTableeRepository tableRepo;
     private final ReservationRepository reservationRepo;
+
+    private final EmailService emailService;
 
     @Override
     public List<RestaurantTable> getAvailableTables(LocalDateTime start, LocalDateTime end) {
@@ -51,7 +54,8 @@ public class ReservationServiceImpl implements ReservationService {
         table.setStatus(TableStatus.RESERVED);
         tableRepo.save(table);
 
-        return reservationRepo.save(r);
+        Reservation saved = reservationRepo.save(r);
+        return saved;
     }
 
     @Override
@@ -65,6 +69,7 @@ public class ReservationServiceImpl implements ReservationService {
         RestaurantTable table = r.getTable();
         table.setStatus(TableStatus.AVAILABLE);
         tableRepo.save(table);
+
     }
 
     @Override
@@ -74,6 +79,7 @@ public class ReservationServiceImpl implements ReservationService {
         table.setStatus(status);
         tableRepo.save(table);
     }
+
     @Override
     public List<Reservation> getAllReservations() {
         return reservationRepo.findAll();

@@ -1,28 +1,44 @@
 import React, { useState } from 'react';  
 import { Link, useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { useAuth } from '../context/AuthContext'; 
+=======
+import { useAuth } from '../context/AuthContext';
+// IMPORT HÌNH NỀN MỚI (Lưu ý: Kiểm tra lại đuôi file .jpg/.png của bạn)
+import bgnhahang from '../assets/bgnhahang.jpg'; 
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+<<<<<<< HEAD
   const { login } = useAuth(); 
+=======
+  const { login } = useAuth();
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Gọi hàm login và nhận lại dữ liệu user
     const userData = await login(email, password);
 
     if (userData) {
+<<<<<<< HEAD
       // Kiểm tra quyền (Role)
 
       if (userData.role === 'ADMIN') {
         navigate('/admin'); 
       } else {
         navigate('/');      
+=======
+      if (userData.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       }
     } else {
       setError('Tên đăng nhập hoặc mật khẩu không đúng.');
@@ -30,59 +46,80 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center py-20 bg-gray-100">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
-        <h2 className="text-3xl font-bold text-center mb-6">Đăng nhập Nhà Hàng</h2>
+    <div 
+      className="min-h-screen flex justify-center items-center bg-cover bg-center relative font-sans"
+      style={{ backgroundImage: `url(${bgnhahang})` }}
+    >
+      {/* Lớp phủ tối màu gradient để làm nổi bật form và chữ */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/40"></div>
+
+      {/* Form Container với hiệu ứng Glassmorphism */}
+      <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] border border-white/20">
         
-        {error && <p className="bg-red-100 text-red-700 p-3 rounded-lg mb-4">{error}</p>}
+        {/* Tiêu đề Gradient */}
+        <h2 className="text-4xl font-extrabold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600 drop-shadow-sm">
+          Đăng Nhập
+        </h2>
         
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Email</label>
+        {error && (
+          <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-xl mb-6 text-sm text-center backdrop-blur-sm">
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="group">
+            <label className="block text-gray-200 mb-2 font-medium ml-1">Email</label>
             <input
               type="email"
-              placeholder="Nhập email của bạn..."
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              placeholder="nhahang@example.com"
+              className="w-full px-5 py-3.5 bg-black/20 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white placeholder-gray-400 transition-all group-hover:bg-black/30"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 mb-2">Mật khẩu</label>
+          
+          <div className="group">
+            <label className="block text-gray-200 mb-2 font-medium ml-1">Mật khẩu</label>
             <input
               type="password"
-              placeholder="Nhập mật khẩu "
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              placeholder="••••••••"
+              className="w-full px-5 py-3.5 bg-black/20 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-white placeholder-gray-400 transition-all group-hover:bg-black/30"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-          <div className='text-right mt-1'>
-                <Link to="/forgot-password" className="text-xs text-blue-500 hover:underline">
-                    Quên mật khẩu?
-                </Link>
-            </div>
 
-            
+          <div className='text-right'>
+            <Link to="/forgot-password" className="text-sm text-yellow-300 hover:text-yellow-100 transition-colors font-medium hover:underline decoration-yellow-300/50">
+                Quên mật khẩu?
+            </Link>
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors"
+            className="w-full py-3.5 rounded-xl font-bold text-lg text-white shadow-lg 
+                       bg-gradient-to-r from-yellow-600 to-yellow-500 
+                       hover:from-yellow-500 hover:to-yellow-400 
+                       transition-all duration-300 transform hover:-translate-y-1 hover:shadow-yellow-500/30"
           >
-            Đăng nhập
+            Đăng Nhập
           </button>
         </form>
-        <p className="text-center mt-6 text-gray-600">
-          Chưa có tài khoản?{' '}
-          <Link to="/signup" className="text-red-500 hover:underline font-medium">
-            Đăng ký ngay
-          </Link>
-        </p>
+
+        <div className="mt-8 pt-6 border-t border-white/10 text-center">
+          <p className="text-gray-300">
+            Chưa có tài khoản?{' '}
+            <Link to="/signup" className="text-yellow-300 hover:text-yellow-100 font-bold ml-1 transition-colors">
+              Đăng ký ngay
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Login;
-
