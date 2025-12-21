@@ -13,19 +13,19 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserId(Long userId);
 
-    @Query("""
-    SELECT new com.luxe_restaurant.app.responses.dish.DishSalesResponse(
-        d.nameDish, c.name, SUM(od.quantity), SUM(od.price * od.quantity)
-    )
-    FROM Order o
-    JOIN o.orderDetails od
-    JOIN od.dish d
-    JOIN d.category c
-    WHERE o.status = 'COMPLETED'
-      AND o.orderDate >= :startDate
-      AND o.orderDate <= :endDate
-    GROUP BY d.nameDish, c.name
-    ORDER BY SUM(od.quantity) DESC
+        @Query("""
+        SELECT new com.luxe_restaurant.app.responses.dish.DishSalesResponse(
+                COALESCE(d.nameDish, od.dishName), COALESCE(c.name, 'Không rõ'), SUM(od.quantity), SUM(od.price * od.quantity)
+        )
+        FROM Order o
+        JOIN o.orderDetails od
+        LEFT JOIN od.dish d
+        LEFT JOIN d.category c
+        WHERE o.status = 'COMPLETED'
+            AND o.orderDate >= :startDate
+            AND o.orderDate <= :endDate
+        GROUP BY COALESCE(d.nameDish, od.dishName), COALESCE(c.name, 'Không rõ')
+        ORDER BY SUM(od.quantity) DESC
 """)
     List<DishSalesResponse> findTopSellingDishes(
             @Param("startDate") LocalDateTime startDate,

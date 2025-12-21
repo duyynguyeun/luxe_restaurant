@@ -7,12 +7,15 @@ import {
 // Nếu backend dùng route khác, sửa lại ở đây:
 const API_URL = 'http://localhost:8080/api/orders/top-dishes';
 
+import { useLanguage } from '../i18n/LanguageProvider';
+
 const AdminManageReportDish = () => {
     const [stats, setStats] = useState([]);
     const [filterType, setFilterType] = useState('day'); // 'day', 'week', 'month'
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10)); // YYYY-MM-DD
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const { t } = useLanguage();
 
     useEffect(() => {
         fetchDishStats();
@@ -44,7 +47,7 @@ const AdminManageReportDish = () => {
     return (
         <div className="p-6 bg-gray-50 rounded-xl shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <h2 className="text-2xl font-bold text-gray-800">Thống Kê Món Ăn Đã Bán</h2>
+                <h2 className="text-2xl font-bold text-gray-800">{t('report_title')}</h2>
                 
                 <div className="flex gap-3 bg-white p-2 rounded shadow-sm">
                     <select 
@@ -76,7 +79,7 @@ const AdminManageReportDish = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     <div className="bg-white p-6 rounded-lg shadow-md h-[500px]">
-                        <h3 className="text-lg font-semibold mb-4 text-center text-gray-700">Biểu đồ số lượng bán ra</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-center text-gray-700">{t('chart_title')}</h3>
                         {stats.length > 0 ? (
                             <ResponsiveContainer width="100%" height="90%">
                                 <BarChart
@@ -118,15 +121,15 @@ const AdminManageReportDish = () => {
                     </div>
 
                     <div className="bg-white p-6 rounded-lg shadow-md flex flex-col h-[500px]">
-                        <h3 className="text-lg font-semibold mb-4 text-gray-700">Chi tiết doanh thu món ăn</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">{t('details_title')}</h3>
                         <div className="overflow-x-auto flex-1 overflow-y-auto">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50 sticky top-0 z-10">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tên món</th>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Danh mục</th>
-                                        <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">SL Bán</th>
-                                        <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Doanh thu</th>
+                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('table_dish')}</th>
+                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('table_category')}</th>
+                                        <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">{t('table_qty')}</th>
+                                        <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">{t('table_revenue')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
@@ -149,7 +152,7 @@ const AdminManageReportDish = () => {
                                     {stats.length === 0 && (
                                         <tr>
                                             <td colSpan="4" className="text-center py-10 text-gray-500">
-                                                Không có dữ liệu hiển thị
+                                                {t('no_data_table')}
                                             </td>
                                         </tr>
                                     )}
@@ -159,9 +162,9 @@ const AdminManageReportDish = () => {
 
                         {stats.length > 0 && (
                             <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center text-sm font-medium">
-                                <span>Tổng số món: {stats.length}</span>
+                                <span>{t('total_items')} {stats.length}</span>
                                 <span className="text-green-700 text-lg">
-                                    Tổng thu: {formatCurrency(stats.reduce((sum, item) => sum + (item.totalRevenue || 0), 0))} 
+                                    {t('total_revenue_label')} {formatCurrency(stats.reduce((sum, item) => sum + (item.totalRevenue || 0), 0))} 
                                 </span>
                             </div>
                         )}

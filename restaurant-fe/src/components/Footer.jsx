@@ -1,5 +1,6 @@
 import React from "react";
 import { Facebook, Instagram, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { useLanguage } from "../i18n/LanguageProvider";
 
 const Footer = () => {
   return (
@@ -17,7 +18,7 @@ const Footer = () => {
             Luxe Restaurant
           </h2>
           <p className="text-gray-300 text-sm leading-relaxed text-justify opacity-90">
-            Hành trình đánh thức vị giác với tinh hoa ẩm thực Việt trong không gian kiến trúc đương đại. Chúng tôi kiến tạo những khoảnh khắc đáng nhớ bằng sự tận tâm và hương vị tuyệt hảo.
+            {useLanguage().t('footer_about_text')}
           </p>
           <div className="flex gap-4">
             <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-amber-500 hover:text-[#174C34] transition-all duration-300 transform hover:-translate-y-1 border border-white/10">
@@ -31,9 +32,9 @@ const Footer = () => {
 
         {/* Cột 2: Liên kết nhanh */}
         <div>
-          <h3 className="text-lg font-bold mb-6 text-amber-300 uppercase tracking-widest text-sm">Khám phá</h3>
+          <h3 className="text-lg font-bold mb-6 text-amber-300 uppercase tracking-widest text-sm">{useLanguage().t('footer_explore')}</h3>
           <ul className="space-y-4">
-            {['Trang chủ', 'Thực đơn đặc sắc', 'Đặt bàn & Liên hệ', 'Lịch sử đơn hàng'].map((item, index) => (
+            {[useLanguage().t('explore_home'), useLanguage().t('explore_menu_link'), useLanguage().t('explore_booking'), useLanguage().t('explore_orders')].map((item, index) => (
               <li key={index}>
                 <a 
                   href={index === 0 ? "/" : index === 1 ? "/menu" : index === 2 ? "/contactPage" : "/my-orders"} 
@@ -49,25 +50,25 @@ const Footer = () => {
 
         {/* Cột 3: Thông tin liên hệ */}
         <div>
-          <h3 className="text-lg font-bold mb-6 text-amber-300 uppercase tracking-widest text-sm">Liên hệ</h3>
+          <h3 className="text-lg font-bold mb-6 text-amber-300 uppercase tracking-widest text-sm">{useLanguage().t('contact_title')}</h3>
           <ul className="space-y-5 text-sm text-gray-300">
             <li className="flex items-start gap-4 group">
               <div className="p-2 bg-white/5 rounded-full text-amber-400 group-hover:bg-amber-500 group-hover:text-[#174C34] transition-colors">
                 <MapPin size={18} />
               </div>
-              <span className="mt-1">136 Xuân Thủy, Cầu Giấy, Hà Nội</span>
+              <span className="mt-1">{useLanguage().t('address')}</span>
             </li>
             <li className="flex items-center gap-4 group">
                <div className="p-2 bg-white/5 rounded-full text-amber-400 group-hover:bg-amber-500 group-hover:text-[#174C34] transition-colors">
                 <Phone size={18} />
               </div>
-              <span className="font-bold text-lg text-white group-hover:text-amber-300 transition-colors">1900 1986</span>
+              <span className="font-bold text-lg text-white group-hover:text-amber-300 transition-colors">{useLanguage().t('phone')}</span>
             </li>
             <li className="flex items-center gap-4 group">
                <div className="p-2 bg-white/5 rounded-full text-amber-400 group-hover:bg-amber-500 group-hover:text-[#174C34] transition-colors">
                 <Mail size={18} />
               </div>
-              <span className="group-hover:text-amber-300 transition-colors">contact@luxe-group.com</span>
+              <span className="group-hover:text-amber-300 transition-colors">{useLanguage().t('email')}</span>
             </li>
           </ul>
         </div>
@@ -101,10 +102,10 @@ const Footer = () => {
 
       {/* Copyright */}
       <div className="max-w-7xl mx-auto px-6 mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
-        <p>© {new Date().getFullYear()} Luxe Restaurant Group. All rights reserved.</p>
+        <p>{useLanguage().t('copyright').replace('{year}', new Date().getFullYear())}</p>
         <div className="flex gap-6 mt-2 md:mt-0">
-          <a href="#" className="hover:text-amber-300 transition-colors">Điều khoản sử dụng</a>
-          <a href="#" className="hover:text-amber-300 transition-colors">Chính sách bảo mật</a>
+          <a href="#" className="hover:text-amber-300 transition-colors">{useLanguage().t('terms')}</a>
+          <a href="#" className="hover:text-amber-300 transition-colors">{useLanguage().t('privacy')}</a>
         </div>
       </div>
     </footer>

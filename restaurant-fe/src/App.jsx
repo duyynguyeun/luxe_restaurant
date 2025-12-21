@@ -5,6 +5,7 @@ import { Suspense, lazy } from "react";
 // 2. IMPORT CÁC PROVIDER
 import { CartProvider } from "./giohang/CartContext"; 
 import { AuthProvider } from "./context/AuthContext"; // Provider cho Đăng nhập
+import { LanguageProvider } from "./i18n/LanguageProvider";
 
 // 3. IMPORT LAYOUT
 import Header from "./components/Header";
@@ -49,7 +50,8 @@ function App() {
     // 6. BỌC CÁC PROVIDER
     <AuthProvider>
       <CartProvider>
-        <Router>
+        <LanguageProvider>
+          <Router>
           {/* 7. BỌC SUSPENSE */}
           <Suspense fallback={<LoadingSpinner />}>
             <ToastContainer position="top-right" autoClose={3000} />
@@ -172,7 +174,8 @@ function App() {
             </Routes>
             <Chatbot/>
           </Suspense>
-        </Router>
+          </Router>
+        </LanguageProvider>
       </CartProvider>
     </AuthProvider>
   );

@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage } from "../i18n/LanguageProvider";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 
@@ -22,10 +23,12 @@ const dishes = [
 ];
 
 const FeaturedMenu = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="bg-gray-100 py-10">
       <h1 className="text-black font-bold text-center pb-10 text-3xl">
-        Những món ăn nổi bật
+        {t('featured_title')}
       </h1>
 
       <div className="px-12">
