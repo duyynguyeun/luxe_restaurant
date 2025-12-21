@@ -1,26 +1,25 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-// Tạo Context
+
 const AuthContext = createContext();
 
-// Tạo custom hook (để dùng cho tiện)
+// Tạo custom hook
 export const useAuth = () => {
   return useContext(AuthContext);
 };
 
 // Tạo Provider
 export const AuthProvider = ({ children }) => {
-  // SỬA ĐỔI: Khởi tạo state trực tiếp từ localStorage để có dữ liệu ngay lập tức
   const [currentUser, setCurrentUser] = useState(() => {
     const storedUser = localStorage.getItem('fakeUser');
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  // Không cần useEffect để load lại user nữa vì đã làm ở trên
+
 
   const login = async (email, password) => {
     try {
-      // Gọi API đến backend (sử dụng biến .env)
+      // Gọi API đến backend
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
         method: 'POST',
         headers: {
@@ -32,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) {
        
         console.error("Đăng nhập thất bại:", response.status);
-        return false; // Báo đăng nhập thất bại
+        return false; 
       }
 
       // Lấy dữ liệu trả về (gồm accessToken, refreshToken, email, role)

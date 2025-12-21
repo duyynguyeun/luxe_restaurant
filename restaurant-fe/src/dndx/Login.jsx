@@ -1,14 +1,22 @@
 import React, { useState } from 'react';  
 import { Link, useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
+import { useAuth } from '../context/AuthContext'; 
+=======
 import { useAuth } from '../context/AuthContext';
 // IMPORT HÌNH NỀN MỚI (Lưu ý: Kiểm tra lại đuôi file .jpg/.png của bạn)
 import bgnhahang from '../assets/bgnhahang.jpg'; 
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+<<<<<<< HEAD
+  const { login } = useAuth(); 
+=======
   const { login } = useAuth();
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -18,10 +26,19 @@ const Login = () => {
     const userData = await login(email, password);
 
     if (userData) {
+<<<<<<< HEAD
+      // Kiểm tra quyền (Role)
+
+      if (userData.role === 'ADMIN') {
+        navigate('/admin'); 
+      } else {
+        navigate('/');      
+=======
       if (userData.role === 'ADMIN') {
         navigate('/admin');
       } else {
         navigate('/');
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       }
     } else {
       setError('Tên đăng nhập hoặc mật khẩu không đúng.');

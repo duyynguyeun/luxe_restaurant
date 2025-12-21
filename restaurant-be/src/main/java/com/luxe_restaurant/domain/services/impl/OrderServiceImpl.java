@@ -12,12 +12,18 @@ import com.luxe_restaurant.domain.repositories.UserRepository;
 import com.luxe_restaurant.domain.services.mail.EmailService;
 import com.luxe_restaurant.domain.services.OrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+<<<<<<< HEAD
+import java.math.RoundingMode;
+=======
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
@@ -25,17 +31,17 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    // Cấu hình điểm
-    private static final BigDecimal BASE_POINTS = new BigDecimal("100"); // 100 điểm cố định/đơn
-    private static final BigDecimal MONEY_RATIO = new BigDecimal("1000"); // mỗi 1000đ được 1 điểm
+    private static final BigDecimal BASE_POINTS = new BigDecimal("100"); 
+    private static final BigDecimal MONEY_RATIO = new BigDecimal("1000"); 
 
-    // Quy tắc chuyển trạng thái hợp lệ
     private static final Map<OrderStatus, List<OrderStatus>> VALID_TRANSITIONS = Map.of(
             OrderStatus.PENDING, List.of(OrderStatus.PAID, OrderStatus.CANCELLED),
             OrderStatus.PAID, List.of(OrderStatus.PREPARING, OrderStatus.CANCELLED),
@@ -44,124 +50,107 @@ public class OrderServiceImpl implements OrderService {
             OrderStatus.CANCELLED, List.of()
     );
 
-    // ------------------- Tạo đơn hàng -------------------
     @Override
     @Transactional
     public Order createOrder(OrderRequest request) {
-
+        // 1. Khởi tạo đối tượng Order từ Request
         Order order = new Order();
         order.setCustomerName(request.getCustomerName());
         order.setCustomerPhone(request.getCustomerPhone());
         order.setCustomerAddress(request.getCustomerAddress());
         order.setTotalPrice(request.getTotalPrice());
         order.setPaymentMethod(request.getPaymentMethod());
-        order.setNote(request.getNote()); // <--- CHỈ CẦN THÊM DÒNG NÀY LÀ XONG
+        order.setNote(request.getNote());
         order.setStatus(OrderStatus.PENDING);
         order.setOrderDate(LocalDateTime.now());
 
-        // Chi tiết món
-        List<OrderDetail> details = new ArrayList<>();
-        for (OrderItemRequest item : request.getItems()) {
-            OrderDetail detail = OrderDetail.builder()
-                    .dishName(item.getDishName())
-                    .quantity(item.getQuantity())
-                    .price(item.getPrice())
-                    .order(order)
-                    .build();
-            details.add(detail);
-        }
-        order.setOrderDetails(details);
-
-        // Có user → gán user
+        // 2. Gán User (nếu có)
         if (request.getUserId() != null) {
             User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             order.setUser(user);
         }
 
-        return orderRepository.save(order);
+        // 3. Xử lý Chi tiết món ăn (OrderDetail)
+        List<OrderDetail> details = new ArrayList<>();
+        if (request.getItems() != null) {
+            for (OrderItemRequest item : request.getItems()) {
+                OrderDetail detail = OrderDetail.builder()
+                        .dishName(item.getDishName())
+                        .quantity(item.getQuantity())
+                        .price(item.getPrice())
+                        .order(order)
+                        .build();
+                details.add(detail);
+            }
+        }
+        order.setOrderDetails(details);
+
+        // 4. Lưu đơn hàng - CHỈ KHAI BÁO BIẾN savedOrder 1 LẦN DUY NHẤT
+        Order savedOrder = orderRepository.save(order);
+
+        // 5. Gửi thông báo REAL-TIME (Dùng tên biến notificationMsg để tránh trùng)
+        try {
+            String notificationMsg = "Đơn hàng mới: #" + savedOrder.getId() + " từ " + savedOrder.getCustomerName();
+            messagingTemplate.convertAndSend("/topic/admin/orders", notificationMsg);
+            log.info("Real-time: Đã gửi thông báo cho đơn hàng mới #{}", savedOrder.getId());
+        } catch (Exception e) {
+            log.error("WebSocket Error: {}", e.getMessage());
+        }
+
+        return savedOrder;
     }
 
-    // ------------------- Cập nhật trạng thái đơn -------------------
     @Override
     @Transactional
     public void updateStatus(Long orderId, String statusStr) {
-
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         OrderStatus currentStatus = order.getStatus();
         OrderStatus newStatus = OrderStatus.valueOf(statusStr.toUpperCase());
 
-        // Nếu giống nhau thì bỏ qua
         if (currentStatus == newStatus) return;
 
-        // Check xem có hợp lệ không
         List<OrderStatus> validNext = VALID_TRANSITIONS.get(currentStatus);
         if (validNext == null || !validNext.contains(newStatus)) {
-            throw new IllegalStateException(
-                    String.format("Không thể chuyển từ %s sang %s", currentStatus, newStatus)
-            );
+            throw new IllegalStateException(String.format("Không thể chuyển từ %s sang %s", currentStatus, newStatus));
         }
 
-        // Lưu trạng thái mới
         order.setStatus(newStatus);
         orderRepository.save(order);
-
-        // Gửi email thông báo
         sendStatusEmail(order, newStatus);
 
-        // Hoàn thành đơn → cộng điểm
         if (newStatus == OrderStatus.COMPLETED && order.getUser() != null) {
             addPointsToUser(order);
         }
     }
 
-    // ------------------- Gửi email theo trạng thái -------------------
     private void sendStatusEmail(Order order, OrderStatus status) {
-
-        if (order.getUser() == null) return;
-
+        if (order.getUser() == null || order.getUser().getEmail() == null) return;
         String email = order.getUser().getEmail();
-        String subject = "Cập nhật trạng thái đơn hàng của bạn";
-        String message;
-
-        switch (status) {
-            case PAID:
-                message = "Đơn hàng của bạn đã được thanh toán thành công!";
-                break;
-            case PREPARING:
-                message = "Đơn hàng của bạn đang được nhà bếp chuẩn bị.";
-                break;
-            case COMPLETED:
-                message = "Đơn hàng của bạn đã hoàn thành. Cảm ơn bạn đã tin tưởng Luxe Restaurant!";
-                break;
-            case CANCELLED:
-                message = "Đơn hàng của bạn đã bị hủy.";
-                break;
-            default:
-                message = "Đơn hàng của bạn được cập nhật trạng thái: " + status;
-        }
-
-        emailService.send(email, subject, message);
+        String subject = "Luxe Restaurant - Cập nhật trạng thái đơn hàng";
+        String content = switch (status) {
+            case PAID -> "Đơn hàng #" + order.getId() + " đã thanh toán.";
+            case PREPARING -> "Nhà bếp đang thực hiện món ăn cho bạn.";
+            case COMPLETED -> "Đơn hàng hoàn tất. Chúc bạn ngon miệng!";
+            case CANCELLED -> "Đơn hàng của bạn đã bị hủy.";
+            default -> "Đơn hàng được cập nhật trạng thái mới: " + status;
+        };
+        emailService.send(email, subject, content);
     }
 
-    // ------------------- Cộng điểm -------------------
     private void addPointsToUser(Order order) {
-
         User user = order.getUser();
-
-        BigDecimal moneyPoints = order.getTotalPrice()
-                .divide(MONEY_RATIO, 0, BigDecimal.ROUND_DOWN);
-
+        BigDecimal moneyPoints = order.getTotalPrice().divide(MONEY_RATIO, 0, RoundingMode.DOWN);
         BigDecimal totalPoints = BASE_POINTS.add(moneyPoints);
-
         BigDecimal currentPoints = user.getPoint() != null ? user.getPoint() : BigDecimal.ZERO;
         user.setPoint(currentPoints.add(totalPoints));
-
         userRepository.save(user);
     }
 
+<<<<<<< HEAD
+=======
 
     @Override
     public List<DishSalesResponse> getTopSellingDishes(String type, LocalDate date) {
@@ -193,12 +182,12 @@ public class OrderServiceImpl implements OrderService {
 
 
     // ------------------- Lấy đơn theo user -------------------
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
     @Override
     public List<Order> getOrdersByUserId(Long userId) {
         return orderRepository.findByUserId(userId);
     }
 
-    // ------------------- Lấy tất cả -------------------
     @Override
     public List<Order> getAllOrders() {
         return orderRepository.findAll();

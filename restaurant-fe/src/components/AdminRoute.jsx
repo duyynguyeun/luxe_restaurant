@@ -12,7 +12,7 @@ const AdminRoute = () => {
   }
 
   // 2. Nếu đã đăng nhập nhưng Role KHÔNG PHẢI là ADMIN -> Đuổi về trang chủ
-  // Lưu ý: Backend đang trả về "ADMIN" (viết hoa), cần so sánh chính xác
+  
   if (currentUser.role !== 'ADMIN') {
     // Bạn có thể hiện thông báo hoặc không
     toast.error("Bạn không có quyền truy cập trang quản trị!"); 

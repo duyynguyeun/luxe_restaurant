@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { toast } from 'react-toastify'; // Sử dụng thư viện thông báo có sẵn
+import { toast } from 'react-toastify'; 
 
 const ProfilePage = () => {
   const { currentUser, updateProfile } = useAuth(); // updateProfile ở đây chỉ để cập nhật lại context/localstorage sau khi API xong
@@ -63,7 +63,7 @@ const ProfilePage = () => {
             return;
         }
     }
-    // ----------------------------
+    
     setIsLoading(true);
 
     try {

@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
 import { CartContext } from "../giohang/CartContext";
-// Import đầy đủ các icon cần dùng
 import { FaQrcode, FaMoneyBillWave, FaTimes, FaCalendarAlt, FaHistory, FaTrash, FaEdit, FaChair, FaClock, FaHashtag, FaCheckCircle, FaBan } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { toast } from 'react-toastify';
@@ -12,7 +11,6 @@ import Datban from "../components/Datban";
 
 moment.locale('vi');
 
-// --- CẤU HÌNH NGÂN HÀNG (QUAN TRỌNG: Đặt ở ngoài component) ---
 const MY_BANK = {
   BANK_ID: "MB", 
   ACCOUNT_NO: "0386984907", 
@@ -74,7 +72,6 @@ const CartPage = () => {
   const [realUserPhone, setRealUserPhone] = useState(""); 
   const [realUserName, setRealUserName] = useState("");
 
-  // --- HÀM TẠO MÃ QR (Đã gia cố để không bị lỗi crash) ---
   const generateQRUrl = (amount) => {
     try {
         // Mặc định nội dung nếu chưa nhập SĐT

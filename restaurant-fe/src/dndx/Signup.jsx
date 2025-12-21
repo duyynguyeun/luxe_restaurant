@@ -1,8 +1,13 @@
 import React, { useState } from 'react'
+<<<<<<< HEAD
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; 
+=======
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify'; 
 // IMPORT HÌNH NỀN MỚI
 import bgnhahang from '../assets/bgnhahang.jpg'; 
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -10,25 +15,46 @@ const Signup = () => {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   
+<<<<<<< HEAD
+  
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1); 
+  const [isLoading, setIsLoading] = useState(false); 
+
+  
+=======
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState(1); 
   const [isLoading, setIsLoading] = useState(false);
 
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
 
+<<<<<<< HEAD
+ 
+=======
   // --- HÀM 1: GỬI OTP ---
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
   const handleSendOtp = async (e) => {
     e.preventDefault(); 
     setError('');
 
+<<<<<<< HEAD
+    // Kiểm tra thông tin 
+=======
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
     if (!email || !phone || !userName || !password) {
         setError('Vui lòng điền đầy đủ thông tin đăng ký!');
         return;
     }
     
+<<<<<<< HEAD
+// Xử lý điều kiện
+=======
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
     const phoneRegex = /^0\d{9}$/;
     if (!phoneRegex.test(phone)) {
         const msg = 'Số điện thoại không hợp lệ! Phải đủ 10 số và bắt đầu bằng số 0.';
@@ -37,6 +63,10 @@ const Signup = () => {
         return;
     }
 
+<<<<<<< HEAD
+    // Xử lý điều kiện
+=======
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(password)) {
         const msg = 'Mật khẩu yếu! Cần tối thiểu 8 ký tự, bao gồm cả chữ và số.';
@@ -48,6 +78,10 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
+<<<<<<< HEAD
+      //  Gọi API /api/user/send-otp
+=======
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       const response = await fetch(`${API_URL}/api/user/send-otp?email=${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,7 +94,12 @@ const Signup = () => {
         return;
       }
 
+<<<<<<< HEAD
+      // Gửi OTP thành công -> Chuyển sang bước 2
+      toast.success('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra!');
+=======
       toast.success('OTP đã được gửi! Vui lòng kiểm tra email.');
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       setStep(2);
 
     } catch (err) {
@@ -72,7 +111,12 @@ const Signup = () => {
     }
   };
 
+<<<<<<< HEAD
+
+  // Bước 2: XÁC THỰC OTP VÀ TẠO TÀI KHOẢN
+=======
   // --- HÀM 2: XÁC THỰC VÀ ĐĂNG KÝ ---
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
   const handleVerifyAndRegister = async (e) => {
     e.preventDefault(); 
     setError('');
@@ -90,9 +134,16 @@ const Signup = () => {
         phone: phone,
         userName: userName,
         password: password,
+<<<<<<< HEAD
+        role: "CUSTOMER"
+      };
+
+      // 2. Gọi API /api/user/verify-otp
+=======
         role: "CUSTOMER" 
       };
 
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       const response = await fetch(
           `${API_URL}/api/user/verify-otp?email=${email}&otp=${otp}`, 
           {
@@ -109,6 +160,10 @@ const Signup = () => {
         return;
       }
 
+<<<<<<< HEAD
+     
+=======
+>>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
       navigate('/login');
 
@@ -140,7 +195,7 @@ const Signup = () => {
             </div>
         )}
 
-        {/* --- STEP 1: NHẬP THÔNG TIN --- */}
+        {/*  STEP 1: NHẬP THÔNG TIN  */}
         {step === 1 && (
             <form className='space-y-5' onSubmit={handleSendOtp}>
               <div>
@@ -208,7 +263,7 @@ const Signup = () => {
             </form>
         )}
 
-        {/* --- STEP 2: NHẬP OTP --- */}
+        {/* STEP 2: NHẬP OTP  */}
         {step === 2 && (
             <form className='space-y-6 animate-fade-in' onSubmit={handleVerifyAndRegister}>
                 <div className='text-center p-4 rounded-2xl bg-green-900/30 border border-green-500/30'>

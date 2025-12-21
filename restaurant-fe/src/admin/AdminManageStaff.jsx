@@ -19,10 +19,10 @@ const AdminManageStaff = () => {
     email: '',
     phone: '',
     password: '',
-    role: 'STAFF' // Mặc định luôn tạo là STAFF
+    role: 'STAFF' 
   });
 
-  // --- 1. TẢI DANH SÁCH NHÂN VIÊN ---
+  // 1. Lấy danh sách nhân viên
   const fetchStaffs = async () => {
     try {
       const res = await fetch(`${API_URL}/api/user/getall`, {
@@ -42,7 +42,7 @@ const AdminManageStaff = () => {
 
   useEffect(() => { fetchStaffs(); }, []);
 
-  // --- 2. XÓA NHÂN VIÊN ---
+  //  2. XÓA NHÂN VIÊN 
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc muốn xóa nhân viên này? Hành động này không thể hoàn tác.")) {
       try {
@@ -60,7 +60,7 @@ const AdminManageStaff = () => {
     }
   };
 
-  // --- 3. MỞ MODAL ---
+  //  3. MỞ MODAL 
   const openAddModal = () => {
     setIsEditing(false);
     setFormData({ userName: '', email: '', phone: '', password: '', role: 'STAFF' });
@@ -80,7 +80,7 @@ const AdminManageStaff = () => {
     setIsFormModalOpen(true);
   };
 
-  // --- 4. XỬ LÝ SUBMIT ---
+  // 4. XỬ LÝ SUBMIT 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);

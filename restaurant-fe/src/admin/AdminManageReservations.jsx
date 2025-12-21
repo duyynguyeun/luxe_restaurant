@@ -11,12 +11,12 @@ const statusColors = {
   COMPLETED: 'bg-green-100 text-green-700',
 };
 
-// --- HÀM 1: NHÓM CÁC ĐẶT BÀN ĐƠN LẺ THÀNH CÁC ĐẶT BÀN LOGIC ---
+
 const groupReservations = (reservations) => {
     const groups = {};
 
     reservations.forEach(res => {
-        // Chuẩn hóa thời gian về UTC để đảm bảo nhóm đúng bất kể múi giờ client
+        // Chuẩn hóa thời gian về UTC 
         const startTimeUTC = moment.utc(res.startTime).toISOString();
         const endTimeUTC = moment.utc(res.endTime).toISOString();
         
@@ -46,7 +46,7 @@ const groupReservations = (reservations) => {
              groups[key].tableNumbers.push(res.table.tableNumber);
         }
         
-        // Cập nhật trạng thái nhóm (Ưu tiên: RESERVED > COMPLETED > CANCELLED)
+        // Cập nhật trạng thái nhóm 
         if (res.status === 'RESERVED') {
              groups[key].status = 'RESERVED';
         } else if (res.status === 'COMPLETED' && groups[key].status !== 'RESERVED') {
@@ -125,18 +125,18 @@ const AdminManageReservations = () => {
 
     useEffect(() => { fetchReservations(); }, []);
 
-    // Xử lý Hủy đặt bàn (PUT /api/reservations/cancel/{id}) -> Dùng MultiAction
+    // Xử lý Hủy đặt bàn 
     const handleCancelGroup = (reservationIds) => {
         if (!window.confirm(`Xác nhận HỦY tất cả ${reservationIds.length} đơn đặt bàn này?`)) return;
         handleMultiAction(reservationIds, 'cancel', 'Đã hủy {count}/{total} đơn đặt bàn.');
     };
     
-    // Xử lý Đánh dấu Bàn Trống (API dùng tableId, áp dụng cho bàn đại diện)
+    // Xử lý Đánh dấu Bàn Trống
     const handleMarkAvailableSingle = async (representativeTableId) => {
         if (!window.confirm("Xác nhận khách đã dùng xong? Bàn đại diện sẽ được đánh dấu TRỐNG.")) return;
 
         try {
-            // API: PUT /api/reservations/table-status/{tableId}?status=AVAILABLE
+            
             const res = await fetch(`${API_URL}/api/reservations/table-status/${representativeTableId}?status=AVAILABLE`, {
                 method: 'PUT',
             });
