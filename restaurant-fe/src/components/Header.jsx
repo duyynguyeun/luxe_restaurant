@@ -38,6 +38,9 @@ const Header = () => {
               <Link to="/menu" className="tour-menu hover:text-yellow-400 transition-colors duration-300">{t('menu')}</Link>
             </li>
             <li>
+              <Link to="/promotions" className="hover:text-yellow-400 transition-colors duration-300">Ưu đãi</Link>
+            </li>
+            <li>
               <Link to="/contactPage" className="hover:text-yellow-400 transition-colors duration-300">{t('about')}</Link>
             </li>
             

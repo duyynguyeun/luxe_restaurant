@@ -23,11 +23,8 @@
     "react-joyride": "^2.9.3",
     "react-router-dom": "^7.9.1",
     "react-toastify": "^11.0.5",
-<<<<<<< HEAD
-    "sockjs-client": "^1.6.1",
-=======
     "recharts": "^3.6.0",
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
+    "sockjs-client": "^1.6.1",
     "sweetalert2": "^11.26.3",
     "swiper": "^12.0.2",
     "tailwindcss": "^4.1.13"

@@ -18,12 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-<<<<<<< HEAD
+
 import java.math.RoundingMode;
-=======
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
@@ -149,8 +149,6 @@ public class OrderServiceImpl implements OrderService {
         userRepository.save(user);
     }
 
-<<<<<<< HEAD
-=======
 
     @Override
     public List<DishSalesResponse> getTopSellingDishes(String type, LocalDate date) {
@@ -179,10 +177,7 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findTopSellingDishes(startDate, endDate);
     }
 
-
-
     // ------------------- Lấy đơn theo user -------------------
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
     @Override
     public List<Order> getOrdersByUserId(Long userId) {
         return orderRepository.findByUserId(userId);

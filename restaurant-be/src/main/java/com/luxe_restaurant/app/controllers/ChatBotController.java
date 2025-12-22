@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.bind.annotation.CrossOrigin; // <-- 1. Thêm dòng này
 
-@CrossOrigin(origins = "http://localhost:5173") // <-- 2. Thêm dòng này (dùng 5173 như bạn nói)
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"}) // <-- 2. Thêm dòng này (dùng 5173 như bạn nói)
 @RestController
 
 @RequestMapping("/api/chatbot")

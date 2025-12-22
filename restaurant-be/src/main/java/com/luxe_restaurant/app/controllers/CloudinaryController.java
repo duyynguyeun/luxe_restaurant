@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
+@CrossOrigin(origins = {"â", "http://localhost:5174"})
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
 public class CloudinaryController {

@@ -1,60 +1,33 @@
 import React, { useState } from 'react'
-<<<<<<< HEAD
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; 
-=======
 import { useNavigate, Link } from 'react-router-dom';
-import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify';
 // IMPORT HÌNH NỀN MỚI
-import bgnhahang from '../assets/bgnhahang.jpg'; 
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
+import bgnhahang from '../assets/bgnhahang.jpg';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  
-<<<<<<< HEAD
-  
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState(1); 
-  const [isLoading, setIsLoading] = useState(false); 
 
-  
-=======
   const [otp, setOtp] = useState('');
-  const [step, setStep] = useState(1); 
+  const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-<<<<<<< HEAD
- 
-=======
   // --- HÀM 1: GỬI OTP ---
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
   const handleSendOtp = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setError('');
 
-<<<<<<< HEAD
-    // Kiểm tra thông tin 
-=======
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
     if (!email || !phone || !userName || !password) {
         setError('Vui lòng điền đầy đủ thông tin đăng ký!');
         return;
     }
-    
-<<<<<<< HEAD
-// Xử lý điều kiện
-=======
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
+
     const phoneRegex = /^0\d{9}$/;
     if (!phoneRegex.test(phone)) {
         const msg = 'Số điện thoại không hợp lệ! Phải đủ 10 số và bắt đầu bằng số 0.';
@@ -63,10 +36,6 @@ const Signup = () => {
         return;
     }
 
-<<<<<<< HEAD
-    // Xử lý điều kiện
-=======
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(password)) {
         const msg = 'Mật khẩu yếu! Cần tối thiểu 8 ký tự, bao gồm cả chữ và số.';
@@ -78,10 +47,6 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-<<<<<<< HEAD
-      //  Gọi API /api/user/send-otp
-=======
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       const response = await fetch(`${API_URL}/api/user/send-otp?email=${email}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,12 +59,7 @@ const Signup = () => {
         return;
       }
 
-<<<<<<< HEAD
-      // Gửi OTP thành công -> Chuyển sang bước 2
-      toast.success('Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra!');
-=======
       toast.success('OTP đã được gửi! Vui lòng kiểm tra email.');
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       setStep(2);
 
     } catch (err) {
@@ -111,14 +71,9 @@ const Signup = () => {
     }
   };
 
-<<<<<<< HEAD
-
-  // Bước 2: XÁC THỰC OTP VÀ TẠO TÀI KHOẢN
-=======
   // --- HÀM 2: XÁC THỰC VÀ ĐĂNG KÝ ---
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
   const handleVerifyAndRegister = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setError('');
 
     if (!otp) {
@@ -134,22 +89,15 @@ const Signup = () => {
         phone: phone,
         userName: userName,
         password: password,
-<<<<<<< HEAD
         role: "CUSTOMER"
       };
 
-      // 2. Gọi API /api/user/verify-otp
-=======
-        role: "CUSTOMER" 
-      };
-
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       const response = await fetch(
-          `${API_URL}/api/user/verify-otp?email=${email}&otp=${otp}`, 
+          `${API_URL}/api/user/verify-otp?email=${email}&otp=${otp}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody) 
+            body: JSON.stringify(requestBody)
           }
       );
 
@@ -160,10 +108,6 @@ const Signup = () => {
         return;
       }
 
-<<<<<<< HEAD
-     
-=======
->>>>>>> 3f33b74aa73b4e16705d82827fc05af3c44bc6a2
       toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
       navigate('/login');
 
@@ -176,9 +120,8 @@ const Signup = () => {
     }
   };
 
-  
   return (
-    <div 
+    <div
       className='min-h-screen flex items-center justify-center bg-cover bg-center relative font-sans'
       style={{ backgroundImage: `url(${bgnhahang})` }}
     >
@@ -188,7 +131,7 @@ const Signup = () => {
         <h2 className='text-3xl font-extrabold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-500 drop-shadow-sm' >
             Đăng Ký
         </h2>
-        
+
         {error && (
             <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-xl mb-6 text-sm text-center backdrop-blur-sm">
                 {error}
@@ -200,20 +143,20 @@ const Signup = () => {
             <form className='space-y-5' onSubmit={handleSendOtp}>
               <div>
                 <label className='block text-gray-200 mb-1 ml-1 font-medium text-sm'>Email</label>
-                  <input 
-                    type="email" 
-                    placeholder='email@example.com' 
+                  <input
+                    type="email"
+                    placeholder='email@example.com'
                     className='w-full px-5 py-3 bg-black/20 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-white placeholder-gray-400 transition-all'
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required 
+                    required
                   />
               </div>
               <div>
                 <label className='block text-gray-200 mb-1 ml-1 font-medium text-sm'>Số điện thoại</label>
-                  <input 
-                    type="text" 
-                    placeholder='09xxxxxxxxx' 
+                  <input
+                    type="text"
+                    placeholder='09xxxxxxxxx'
                     className='w-full px-5 py-3 bg-black/20 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-white placeholder-gray-400 transition-all'
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -222,9 +165,9 @@ const Signup = () => {
               </div>
               <div>
                 <label className='block text-gray-200 mb-1 ml-1 font-medium text-sm'>Tên hiển thị</label>
-                  <input 
-                    type="text" 
-                    placeholder='Tên của bạn' 
+                  <input
+                    type="text"
+                    placeholder='Tên của bạn'
                     className='w-full px-5 py-3 bg-black/20 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-white placeholder-gray-400 transition-all'
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
@@ -233,21 +176,21 @@ const Signup = () => {
               </div>
               <div>
                 <label className='block text-gray-200 mb-1 ml-1 font-medium text-sm'>Mật khẩu</label>
-                  <input 
-                    type="password" 
-                    placeholder='••••••••' 
+                  <input
+                    type="password"
+                    placeholder='••••••••'
                     className='w-full px-5 py-3 bg-black/20 border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-white placeholder-gray-400 transition-all'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
               </div>
-            
+
               <button
-                  type="submit" 
-                  className="w-full py-3.5 mt-4 rounded-xl font-bold text-lg text-white shadow-lg 
-                             bg-gradient-to-r from-green-600 to-green-500 
-                             hover:from-green-500 hover:to-green-400 
+                  type="submit"
+                  className="w-full py-3.5 mt-4 rounded-xl font-bold text-lg text-white shadow-lg
+                             bg-gradient-to-r from-green-600 to-green-500
+                             hover:from-green-500 hover:to-green-400
                              disabled:opacity-50 disabled:cursor-not-allowed
                              transition-all duration-300 transform hover:-translate-y-1 hover:shadow-green-500/30"
                   disabled={isLoading}
@@ -273,20 +216,20 @@ const Signup = () => {
 
                 <div>
                     <label className='block text-center text-gray-200 mb-3 font-bold tracking-wider text-sm uppercase'>Nhập Mã OTP</label>
-                    <input 
-                        type="text" 
-                        placeholder='- - - - - -' 
+                    <input
+                        type="text"
+                        placeholder='- - - - - -'
                         className='w-full border border-white/20 px-4 py-4 rounded-2xl focus:ring-2 focus:ring-green-400 focus:outline-none text-3xl tracking-[0.5em] text-center font-bold text-white bg-black/20 transition-all placeholder-gray-500'
                         maxLength="6"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
-                        required 
+                        required
                     />
                 </div>
-                
+
                 <div className='flex justify-between gap-4 pt-2'>
                     <button
-                        type="button" 
+                        type="button"
                         onClick={() => {setStep(1); setError('')}}
                         className="w-1/3 bg-gray-600/50 hover:bg-gray-600 text-white py-3 rounded-xl font-bold transition-all border border-white/10"
                         disabled={isLoading}
@@ -294,7 +237,7 @@ const Signup = () => {
                         Quay lại
                     </button>
                     <button
-                        type="submit" 
+                        type="submit"
                         className="w-2/3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-green-500/30 disabled:opacity-50"
                         disabled={isLoading}
                     >

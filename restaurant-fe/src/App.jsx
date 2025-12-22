@@ -32,7 +32,9 @@ const ForgotPassword = lazy(() => import('./dndx/ForgotPassword'));
 const MyOrders = lazy(() => import('./giohang/MyOrders'));
 // Chúng ta vẫn cần lazy load trang Profile
 const ProfilePage = lazy(() => import('./dndx/ProfilePage')); 
+const PromotionsPage = lazy(() => import('./components/PromotionsPage'));
 import Chatbot from "./Chatbot/Chatbot";
+import ChatWidget from "./components/ChatWidget";
 
 // 5. LAZY LOAD CÁC TRANG ADMIN
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
@@ -43,6 +45,7 @@ const AdminManageReservations = lazy(() => import('./admin/AdminManageReservatio
 const AdminManageUsers = lazy(() => import('./admin/AdminManageUsers'));
 const AdminManageStaff = lazy(() => import('./admin/AdminManageStaff')); // <--- Import component mới
 const AdminManageReports = lazy(() => import('./admin/AdminManageReports'));
+const AdminManagePromotions = lazy(() => import('./admin/AdminManagePromotions'));
 
 
 function App() {
@@ -69,6 +72,7 @@ function App() {
                   <Route path="users" element={<AdminManageUsers />} />
                   <Route path="staff" element={<AdminManageStaff />} />
                   <Route path="reports" element={<AdminManageReports />} />
+                  <Route path="promotions" element={<AdminManagePromotions />} />
                 </Route>
               </Route>
 
@@ -130,6 +134,16 @@ function App() {
                   </>
                 }
               />
+              <Route
+                path="/promotions"
+                element={
+                  <>
+                    <Header/>
+                    <PromotionsPage/>
+                    <Footer />
+                  </>
+                }
+              />
               <Route 
                 path="/cart"
                 element={
@@ -173,6 +187,8 @@ function App() {
               
             </Routes>
             <Chatbot/>
+            {/* Real-time chat widget */}
+            <ChatWidget />
           </Suspense>
           </Router>
         </LanguageProvider>

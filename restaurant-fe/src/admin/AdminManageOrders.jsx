@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const AdminManageOrders = () => {
   const [orders, setOrders] = useState([]);
+  const { currentUser } = useAuth();
 
   // Lấy danh sách đơn từ Backend
   const fetchOrders = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/getall`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/getall`, {
+        headers: {
+          'Authorization': `Bearer ${currentUser?.token}`
+        }
+      });
       if (res.ok) {
         const data = await res.json();
         setOrders(data.reverse()); 
@@ -16,13 +22,22 @@ const AdminManageOrders = () => {
     }
   };
 
-  useEffect(() => { fetchOrders(); }, []);
+  useEffect(() => { 
+    if (currentUser) {
+      fetchOrders(); 
+    }
+  }, [currentUser]);
 
   // Cập nhật trạng thái đơn
   const updateStatus = async (id, newStatus) => {
     await fetch(
       `${import.meta.env.VITE_API_URL}/api/orders/update-status/${id}?status=${newStatus}`,
-      { method: 'PUT' }
+      { 
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${currentUser?.token}`
+        }
+      }
     );
     fetchOrders();
   };
@@ -37,7 +52,7 @@ const AdminManageOrders = () => {
             <tr>
               <th className="p-3 text-left">ID</th>
               <th className="p-3 text-left">Khách hàng & Địa chỉ</th>
-              <th className="p-3 text-left">Món ăn</th> {/* Cột Món ăn mới thêm */}
+              <th className="p-3 text-left">Món ăn</th>
               <th className="p-3 text-left">Tổng tiền</th>
               <th className="p-3 text-center">Thanh toán</th>
               <th className="p-3 text-center">Trạng thái</th>

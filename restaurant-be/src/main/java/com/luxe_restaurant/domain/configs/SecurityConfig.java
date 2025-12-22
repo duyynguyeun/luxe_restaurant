@@ -37,6 +37,7 @@ public class SecurityConfig {
             "/v3/api-docs.yaml",
             "/swagger-resources/**",
             "/api/chatbot",
+            "/ws/**",
             "/api/login",
             "/api/user/**",
             "/api/dish/**",
