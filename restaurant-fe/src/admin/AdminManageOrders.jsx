@@ -1,46 +1,191 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const AdminManageOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { currentUser } = useAuth();
 
   // Lấy danh sách đơn từ Backend
   const fetchOrders = async () => {
+    console.log('=== fetchOrders Debug ===');
+    console.log('currentUser:', currentUser);
+    console.log('currentUser.token exists:', !!currentUser?.token);
+    
+    if (!currentUser?.token) {
+      setError('Chưa xác thực. Vui lòng đăng nhập.');
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/getall`, {
+      const apiUrl = `${import.meta.env.VITE_API_URL || ''}/api/orders/getall`;
+      const token = currentUser.token;
+      
+      console.log('Fetching from:', apiUrl);
+      console.log('Token length:', token?.length);
+      console.log('Token preview:', token?.substring(0, 50) + '...');
+      
+      const res = await fetch(apiUrl, {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${currentUser?.token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         }
       });
+      
+      console.log('Response status:', res.status);
+      
       if (res.ok) {
         const data = await res.json();
-        setOrders(data.reverse()); 
+        console.log('Orders fetched successfully:', data);
+        // Handle Spring Data Page response - extract content array
+        const orderList = data.content ? data.content.reverse() : (Array.isArray(data) ? data.reverse() : []);
+        setOrders(orderList);
+        setError(null);
+      } else {
+        const errorText = await res.text();
+        console.error('API Error Response:', errorText);
+        let errorDetail = errorText;
+        try {
+          const jsonError = JSON.parse(errorText);
+          errorDetail = jsonError.message || jsonError.error || errorText;
+        } catch (e) {
+          // Not JSON, use plain text
+        }
+        const errorMsg = `Lỗi HTTP ${res.status}: ${errorDetail || 'Không thể tải danh sách đơn hàng'}`;
+        console.error('Full error:', errorMsg);
+        setError(errorMsg);
+        toast.error(errorMsg);
       }
     } catch (err) { 
-      console.error(err); 
+      const errorMsg = `Lỗi kết nối: ${err.message}`;
+      console.error('Lỗi fetch:', err);
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => { 
-    if (currentUser) {
-      fetchOrders(); 
-    }
-  }, [currentUser]);
+    fetchOrders();
+    // Lắng nghe sự kiện làm mới dữ liệu từ AdminLayout
+    const handleRefresh = (event) => {
+      if (event.detail === 'ORDER' || event.detail === 'ORDERS') {
+        fetchOrders();
+      }
+    };
+    window.addEventListener('REFRESH_ADMIN_DATA', handleRefresh);
+    return () => window.removeEventListener('REFRESH_ADMIN_DATA', handleRefresh);
+  }, [currentUser?.token]);
 
   // Cập nhật trạng thái đơn
   const updateStatus = async (id, newStatus) => {
-    await fetch(
-      `${import.meta.env.VITE_API_URL}/api/orders/update-status/${id}?status=${newStatus}`,
-      { 
+    try {
+      const apiUrl = `${import.meta.env.VITE_API_URL || ''}/api/orders/update-status/${id}?status=${newStatus}`;
+      const token = currentUser?.token;
+      
+      console.log('Updating order:', apiUrl);
+      console.log('Token present:', !!token);
+      
+      const res = await fetch(apiUrl, { 
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${currentUser?.token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
+      });
+      
+      if (res.ok) {
+        toast.success(`Cập nhật trạng thái thành công!`);
+        await fetchOrders();
+      } else {
+        const errorMsg = `Cập nhật thất bại: HTTP ${res.status}`;
+        console.error(errorMsg);
+        toast.error(errorMsg);
       }
-    );
-    fetchOrders();
+    } catch (err) {
+      console.error('Lỗi cập nhật:', err);
+      toast.error(`Lỗi: ${err.message}`);
+    }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="bg-white p-8 rounded-lg shadow-lg flex items-center justify-center min-h-96">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+          <p className="mt-4 text-gray-600">Đang tải danh sách đơn hàng...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-white p-8 rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">Quản lý Đơn hàng</h2>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start gap-4">
+          <div className="text-3xl">⚠️</div>
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-red-800">Lỗi tải dữ liệu</h3>
+            <p className="text-red-700 mt-2 font-mono text-sm break-words whitespace-pre-wrap">{error}</p>
+            
+            {/* Debug Info */}
+            <div className="bg-gray-100 border border-gray-300 rounded p-3 mt-4 text-xs font-mono">
+              <div><strong>📊 Debug Info:</strong></div>
+              <div>✓ Đã đăng nhập: {currentUser ? 'Yes' : 'No'}</div>
+              <div>✓ Email: {currentUser?.email || 'N/A'}</div>
+              <div>✓ Token: {currentUser?.token ? currentUser.token.substring(0, 30) + '...' : 'No token'}</div>
+              <div>✓ API Base: {import.meta.env.VITE_API_URL || '(empty - using relative path)'}</div>
+              <div>✓ Full URL: {import.meta.env.VITE_API_URL || ''}/api/orders/getall</div>
+              <div className="mt-2 border-t pt-2">
+                <strong>🔍 Các bước kiểm tra:</strong>
+                <div>1. Mở DevTools (F12) → Console → xem error chi tiết</div>
+                <div>2. Kiểm tra backend logs tại http://localhost:8080</div>
+                <div>3. Đảm bảo database đang chạy</div>
+                <div>4. Kiểm tra API endpoint: GET /api/orders/getall</div>
+              </div>
+            </div>
+            
+            <button 
+              onClick={fetchOrders}
+              className="mt-4 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition"
+            >
+              🔄 Thử lại
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (orders.length === 0) {
+    return (
+      <div className="bg-white p-8 rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">Quản lý Đơn hàng</h2>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="text-6xl mb-4">📭</div>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">Chưa có đơn hàng</h3>
+          <p className="text-gray-500 mb-6">Danh sách đơn hàng đang trống. Hãy quay lại sau!</p>
+          <button 
+            onClick={fetchOrders}
+            className="bg-orange-600 text-white px-6 py-2 rounded hover:bg-orange-700 transition"
+          >
+            🔄 Làm mới dữ liệu
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg">

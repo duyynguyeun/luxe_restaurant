@@ -25,7 +25,9 @@ const AdminDashboard = () => {
         const orderRes = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/getall`, {
             headers: { 'Authorization': `Bearer ${currentUser?.token}` }
         });
-        const orders = orderRes.ok ? await orderRes.json() : [];
+        const orderData = orderRes.ok ? await orderRes.json() : {};
+        // Handle Spring Data Page response - extract content array
+        const orders = orderData.content ? orderData.content : (Array.isArray(orderData) ? orderData : []);
 
         const todayStr = new Date().toISOString().split('T')[0];
         const countOrdersToday = orders.filter(order => 

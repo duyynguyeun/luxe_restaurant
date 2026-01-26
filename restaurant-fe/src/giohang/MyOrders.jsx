@@ -8,18 +8,28 @@ const MyOrders = () => {
   const [orders, setOrders] = useState([]);
 
   // Hàm tải danh sách đơn hàng
-  const fetchOrders = () => {
+  const fetchOrders = async () => {
     if (currentUser && currentUser.id) {
-      fetch(`${import.meta.env.VITE_API_URL}/api/orders/findOrder/${currentUser.id}`)
-        .then(res => res.json())
-        .then(data => setOrders(data.reverse())) // Đơn mới nhất lên đầu
-        .catch(err => console.error(err));
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/findOrder/${currentUser.id}`);
+        if (!response.ok) throw new Error('Failed to fetch orders');
+        const data = await response.json();
+        // Kiểm tra nếu data là array, nếu không thì gán mảng rỗng
+        const orderList = Array.isArray(data) ? data.reverse() : [];
+        setOrders(orderList);
+      } catch (err) {
+        console.error('Lỗi khi tải đơn hàng:', err);
+        setOrders([]);
+        toast.error('Không thể tải danh sách đơn hàng');
+      }
     }
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, [currentUser]);
+    if (currentUser?.id) {
+      fetchOrders();
+    }
+  }, [currentUser?.id]);
 
   // --- HÀM XỬ LÝ HỦY ĐƠN HÀNG ---
   const handleCancelOrder = async (orderId) => {
