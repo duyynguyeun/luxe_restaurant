@@ -13,6 +13,8 @@ import com.luxe_restaurant.domain.services.mail.EmailService;
 import com.luxe_restaurant.domain.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -179,12 +181,14 @@ public class OrderServiceImpl implements OrderService {
 
     // ------------------- Lấy đơn theo user -------------------
     @Override
+    @Transactional(readOnly = true)
     public List<Order> getOrdersByUserId(Long userId) {
         return orderRepository.findByUserId(userId);
     }
 
     @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    @Transactional(readOnly = true)
+    public Page<Order> getAllOrders(Pageable pageable) {
+        return orderRepository.findAllWithDetails(pageable);
     }
 }

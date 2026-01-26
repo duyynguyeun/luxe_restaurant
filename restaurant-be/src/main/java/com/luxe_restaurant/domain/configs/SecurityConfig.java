@@ -52,6 +52,7 @@ public class SecurityConfig {
             "/api/orders/**", 
             "/api/images",
             "/api/orders/update-status/**",
+            "/api/orders/getall",
             "/api/orders/findOrder/**",
             "/api/reservations/**",
             "/api/promotion/**",
@@ -85,11 +86,13 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return new ProviderManager(authenticationProvider);
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

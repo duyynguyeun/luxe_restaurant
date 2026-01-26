@@ -33,5 +33,4 @@ public class PromotionController {
     public ResponseEntity<?> getAllPromotions() {
         return ResponseEntity.ok(promotionService.getAllPromotions());
     }
-
 }

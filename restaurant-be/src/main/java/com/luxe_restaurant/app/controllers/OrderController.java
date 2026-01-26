@@ -2,9 +2,12 @@ package com.luxe_restaurant.app.controllers;
 
 import com.luxe_restaurant.app.requests.order.OrderRequest;
 import com.luxe_restaurant.app.responses.dish.DishSalesResponse;
+import com.luxe_restaurant.app.responses.page.PageResponse;
 import com.luxe_restaurant.domain.entities.Order;
 import com.luxe_restaurant.domain.services.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +28,8 @@ public class OrderController {
     }
 
     @GetMapping("/getall")
-    public List<Order> getAllOrders() {
-        return orderService.getAllOrders();
+    public PageResponse<Order> getAllOrders(@PageableDefault (size = 10, page = 0) Pageable pageable) {
+        return new PageResponse<>(orderService.getAllOrders(pageable));
     }
 
     @PutMapping("/update-status/{id}")

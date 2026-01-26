@@ -2,6 +2,8 @@ package com.luxe_restaurant.domain.repositories;
 
 import com.luxe_restaurant.app.responses.dish.DishSalesResponse;
 import com.luxe_restaurant.domain.entities.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +13,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findByUserId(Long userId);
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.orderDetails WHERE o.user.id = :userId")
+    List<Order> findByUserId(@Param("userId") Long userId);
 
         @Query("""
         SELECT new com.luxe_restaurant.app.responses.dish.DishSalesResponse(
@@ -32,6 +35,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("endDate")   LocalDateTime endDate
     );
 
+    Page<Order> findAll(Pageable pageable);
 
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.orderDetails")
+    Page<Order> findAllWithDetails(Pageable pageable);
 
 }
