@@ -25,7 +25,7 @@
     npm install
 ## Cấu hình hệ thống
 - Database: CREATE DATABASE luxe_restaurant;
-- File cấu hình backend (application.yml): 
+- File cấu hình backend (application.yaml): 
     Thông tin lấy ở file docs.
 - File cấu hình Frontend (.env) : VITE_API_URL=http://localhost:8080
 ## Khởi chạy hệ thống
