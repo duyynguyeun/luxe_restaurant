@@ -8,10 +8,10 @@ import java.util.List;
 @Data
 public class PageResponse<T> {
     private List<T> content;
-    private PageCustom<T> page;
+    private PageCustom<T> metadata;
 
     public PageResponse( Page<T> page) {
         this.content = page.getContent();
-        this.page = new  PageCustom<T>(page);
+        this.metadata = new  PageCustom<T>(page);
     }
 }

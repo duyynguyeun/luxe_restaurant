@@ -57,7 +57,6 @@ public class SecurityConfig {
             "/api/reservations/**",
             "/api/promotion/**",
             "/api/promotion/update/**",
-
     };
 
     @Bean
@@ -86,7 +85,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 

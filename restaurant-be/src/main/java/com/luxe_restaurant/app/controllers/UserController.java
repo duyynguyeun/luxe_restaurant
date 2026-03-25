@@ -2,13 +2,17 @@ package com.luxe_restaurant.app.controllers;
 
 import com.luxe_restaurant.app.requests.users.UserCreateRequest;
 import com.luxe_restaurant.app.requests.ResetPasswordRequest;
+import com.luxe_restaurant.app.responses.page.PageResponse;
 import com.luxe_restaurant.app.responses.users.UserCreateResponse;
 import com.luxe_restaurant.app.responses.users.UserResponse;
+import com.luxe_restaurant.domain.entities.User;
 import com.luxe_restaurant.domain.repositories.UserRepository;
 import com.luxe_restaurant.domain.services.UserService;
 import com.luxe_restaurant.domain.services.mail.OtpService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -105,8 +109,8 @@ public class UserController {
     }
 
     @GetMapping("/getall")
-    public List<UserResponse> getAllUsers(){
-        return userService.getAllUsers();
+    public PageResponse<User> getAllUsers(@PageableDefault (size = 5, page = 0) Pageable pageable){
+        return new PageResponse<>(userService.getAllUsers(pageable));
     }
 
     @GetMapping("/find/{id}")

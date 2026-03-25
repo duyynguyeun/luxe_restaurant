@@ -20,6 +20,6 @@ public class UserCustomizeService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("User does not exist"));
 
     return new CustomUserDetail(user); // <-- Phải trả về đối tượng này
-}
+    }
 
 }
