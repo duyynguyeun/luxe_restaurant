@@ -4,6 +4,9 @@ import com.luxe_restaurant.domain.entities.Reservation;
 import com.luxe_restaurant.domain.entities.RestaurantTable;
 import com.luxe_restaurant.domain.enums.ReservationStatus;
 import com.luxe_restaurant.domain.enums.TableStatus;
+import com.luxe_restaurant.domain.exception.BusinessException;
+import com.luxe_restaurant.domain.exception.ErrorCode;
+import com.luxe_restaurant.domain.exception.NotFoundException;
 import com.luxe_restaurant.domain.repositories.ReservationRepository;
 import com.luxe_restaurant.domain.repositories.RestaurantTableeRepository;
 import com.luxe_restaurant.domain.services.ReservationService;
@@ -38,10 +41,10 @@ public class ReservationServiceImpl implements ReservationService {
     public Reservation createReservation(String name, String phone, Long tableId, LocalDateTime start, LocalDateTime end) {
 
         RestaurantTable table = tableRepo.findById(tableId)
-                .orElseThrow(() -> new RuntimeException("Table not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TABLE_001));
 
         if (!reservationRepo.findOverlapping(table, start, end).isEmpty()) {
-            throw new IllegalStateException("Table already booked in this time period");
+            throw new BusinessException(ErrorCode.RESERVATION_002);
         }
 
         Reservation r = new Reservation();
@@ -61,7 +64,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public void cancelReservation(Long id) {
         Reservation r = reservationRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVATION_001));
 
         r.setStatus(ReservationStatus.CANCELLED);
         reservationRepo.save(r);
@@ -75,7 +78,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public void updateTableStatus(Long tableId, TableStatus status) {
         RestaurantTable table = tableRepo.findById(tableId)
-                .orElseThrow(() -> new RuntimeException("Table not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TABLE_001));
         table.setStatus(status);
         tableRepo.save(table);
     }
@@ -85,3 +88,4 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepo.findAll();
     }
 }
+

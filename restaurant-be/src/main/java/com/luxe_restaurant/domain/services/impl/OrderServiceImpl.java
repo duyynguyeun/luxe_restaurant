@@ -7,6 +7,9 @@ import com.luxe_restaurant.domain.entities.Order;
 import com.luxe_restaurant.domain.entities.OrderDetail;
 import com.luxe_restaurant.domain.entities.User;
 import com.luxe_restaurant.domain.enums.OrderStatus;
+import com.luxe_restaurant.domain.exception.BusinessException;
+import com.luxe_restaurant.domain.exception.ErrorCode;
+import com.luxe_restaurant.domain.exception.NotFoundException;
 import com.luxe_restaurant.domain.repositories.OrderRepository;
 import com.luxe_restaurant.domain.repositories.UserRepository;
 import com.luxe_restaurant.domain.services.mail.EmailService;
@@ -69,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
         // 2. Gán User (nếu có)
         if (request.getUserId() != null) {
             User user = userRepository.findById(request.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.USER_001));
             order.setUser(user);
         }
 
@@ -88,10 +91,10 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setOrderDetails(details);
 
-        // 4. Lưu đơn hàng - CHỈ KHAI BÁO BIẾN savedOrder 1 LẦN DUY NHẤT
+        // 4. Lưu đơn hàng
         Order savedOrder = orderRepository.save(order);
 
-        // 5. Gửi thông báo REAL-TIME (Dùng tên biến notificationMsg để tránh trùng)
+        // 5. Gửi thông báo REAL-TIME
         try {
             String notificationMsg = "Đơn hàng mới: #" + savedOrder.getId() + " từ " + savedOrder.getCustomerName();
             messagingTemplate.convertAndSend("/topic/admin/orders", notificationMsg);
@@ -107,7 +110,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void updateStatus(Long orderId, String statusStr) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_001));
 
         OrderStatus currentStatus = order.getStatus();
         OrderStatus newStatus = OrderStatus.valueOf(statusStr.toUpperCase());
@@ -116,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderStatus> validNext = VALID_TRANSITIONS.get(currentStatus);
         if (validNext == null || !validNext.contains(newStatus)) {
-            throw new IllegalStateException(String.format("Không thể chuyển từ %s sang %s", currentStatus, newStatus));
+            throw new BusinessException(ErrorCode.ORDER_003, String.format("Không thể chuyển từ %s sang %s", currentStatus, newStatus));
         }
 
         order.setStatus(newStatus);

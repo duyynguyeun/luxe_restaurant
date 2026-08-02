@@ -109,8 +109,10 @@ public class UserController {
     }
 
     @GetMapping("/getall")
-    public PageResponse<User> getAllUsers(@PageableDefault (size = 5, page = 0) Pageable pageable){
-        return new PageResponse<>(userService.getAllUsers(pageable));
+    public PageResponse<User> getAllUsers(
+            @RequestParam(required = false) String role,
+            @PageableDefault (size = 5, page = 0) Pageable pageable){
+        return new PageResponse<>(userService.getAllUsers(role, pageable));
     }
 
     @GetMapping("/find/{id}")

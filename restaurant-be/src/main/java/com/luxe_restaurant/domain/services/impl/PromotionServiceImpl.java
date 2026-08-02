@@ -3,6 +3,8 @@ package com.luxe_restaurant.domain.services.impl;
 import com.luxe_restaurant.app.requests.promotion.PromotionRequest;
 import com.luxe_restaurant.app.responses.promotion.PromotionResponse;
 import com.luxe_restaurant.domain.entities.Promotion;
+import com.luxe_restaurant.domain.exception.ErrorCode;
+import com.luxe_restaurant.domain.exception.NotFoundException;
 import com.luxe_restaurant.domain.repositories.PromotionRepository;
 import com.luxe_restaurant.domain.services.PromotionService;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +42,7 @@ public class PromotionServiceImpl implements PromotionService {
     @Override
     public PromotionResponse updatePromotion (Long id, PromotionRequest promotionRequest) {
         Promotion promotion = promotionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Promotion Not Found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PROMOTION_001));
 
         promotion.setTitle(promotionRequest.getTitle());
         promotion.setImageUrl(promotionRequest.getImageUrl());

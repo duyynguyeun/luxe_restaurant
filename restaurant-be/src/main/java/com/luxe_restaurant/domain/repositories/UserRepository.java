@@ -1,6 +1,7 @@
 package com.luxe_restaurant.domain.repositories;
 
 import com.luxe_restaurant.domain.entities.User;
+import com.luxe_restaurant.domain.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Optional<User> findByUserName(String username);
     Page<User> findAll(Pageable pageable);
+    Page<User> findByRole(Role role, Pageable pageable);
 }

@@ -4,6 +4,8 @@ import com.luxe_restaurant.app.requests.report.ReportRequest;
 import com.luxe_restaurant.app.responses.report.ReportResponse;
 import com.luxe_restaurant.domain.entities.Report;
 import com.luxe_restaurant.domain.entities.User;
+import com.luxe_restaurant.domain.exception.ErrorCode;
+import com.luxe_restaurant.domain.exception.NotFoundException;
 import com.luxe_restaurant.domain.repositories.ReportRepository;
 import com.luxe_restaurant.domain.repositories.UserRepository;
 import com.luxe_restaurant.domain.services.ReportService;
@@ -21,7 +23,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public ReportResponse createReport(ReportRequest reportRequest) {
 
-        User user = userRepository.findById(reportRequest.getUserId()).orElseThrow(()-> new RuntimeException("user not found"));
+        User user = userRepository.findById(reportRequest.getUserId()).orElseThrow(()-> new NotFoundException(ErrorCode.USER_001));
 
         Report report = Report.builder()
                 .text(reportRequest.getText())

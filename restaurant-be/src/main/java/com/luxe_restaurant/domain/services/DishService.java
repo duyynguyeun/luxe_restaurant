@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface DishService {
     DishResponse createDish(@RequestBody DishRequest dishRequest);
-    List<DishResponse> getAllDishes();
+    org.springframework.data.domain.Page<DishResponse> getAllDishes(org.springframework.data.domain.Pageable pageable);
     DishResponse updateDish(@PathVariable Long id, @RequestBody DishRequest dishRequest);
     void deleteDish(@PathVariable Long id);
     DishResponse getDishById(@PathVariable Long id);

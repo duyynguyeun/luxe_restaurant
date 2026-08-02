@@ -12,6 +12,6 @@ public interface UserService {
     UserCreateResponse createUser(UserCreateRequest request);
     UserResponse updateUser(@PathVariable  Long id, UserCreateRequest request);
     void deleteUser(@PathVariable  Long id);
-    Page<User> getAllUsers(Pageable pageable);
+    Page<User> getAllUsers(String role, Pageable pageable);
     UserResponse getUserById(@PathVariable  Long id);
 }

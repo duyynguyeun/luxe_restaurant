@@ -5,6 +5,9 @@ import com.luxe_restaurant.app.responses.users.UserCreateResponse;
 import com.luxe_restaurant.app.responses.users.UserResponse;
 import com.luxe_restaurant.domain.entities.User;
 import com.luxe_restaurant.domain.enums.Role;
+import com.luxe_restaurant.domain.exception.BusinessException;
+import com.luxe_restaurant.domain.exception.ErrorCode;
+import com.luxe_restaurant.domain.exception.NotFoundException;
 import com.luxe_restaurant.domain.repositories.UserRepository;
 import com.luxe_restaurant.domain.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +37,18 @@ public class UserServiceImpl implements UserService {
     private void validateUserData(String phone, String password, boolean isPasswordRequired) {
         // 1. Validate Phone
         if (phone == null || !Pattern.matches(PHONE_REGEX, phone)) {
-            throw new RuntimeException("Số điện thoại không hợp lệ! Phải đủ 10 số và bắt đầu bằng số 0.");
+            throw new BusinessException(ErrorCode.SYS_002, "Số điện thoại không hợp lệ! Phải đủ 10 số và bắt đầu bằng số 0.");
         }
 
         // 2. Validate Password
         if (isPasswordRequired) {
             if (password == null || !Pattern.matches(PASSWORD_REGEX, password)) {
-                throw new RuntimeException("Mật khẩu phải từ 6 ký tự trở lên và chứa cả chữ và số.");
+                throw new BusinessException(ErrorCode.SYS_002, "Mật khẩu phải từ 8 ký tự trở lên và chứa cả chữ và số.");
             }
         } else {
             // Nếu không bắt buộc (trường hợp update), chỉ check nếu user có nhập password mới
             if (password != null && !password.isEmpty() && !Pattern.matches(PASSWORD_REGEX, password)) {
-                throw new RuntimeException("Mật khẩu mới phải từ 6 ký tự trở lên và chứa cả chữ và số.");
+                throw new BusinessException(ErrorCode.SYS_002, "Mật khẩu mới phải từ 8 ký tự trở lên và chứa cả chữ và số.");
             }
         }
     }
@@ -53,14 +56,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserCreateResponse createUser(UserCreateRequest request) {
         if(userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email đã tồn tại!");
+            throw new BusinessException(ErrorCode.USER_002);
         }
 
         // --- GỌI HÀM VALIDATE ---
         validateUserData(request.getPhone(), request.getPassword(), true);
         // ------------------------
-
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         User user = User.builder()
                 .userName(request.getUserName())
@@ -80,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse updateUser(Long id, UserCreateRequest request) {
-        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(()-> new NotFoundException(ErrorCode.USER_001));
 
         validateUserData(request.getPhone(), request.getPassword(), false);
 
@@ -108,12 +109,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserById(Long id){
-        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(()-> new NotFoundException(ErrorCode.USER_001));
         return modelMapper.map(user, UserResponse.class);
     }
 
     @Override
-    public Page<User> getAllUsers(Pageable pageable){
+    public Page<User> getAllUsers(String role, Pageable pageable){
+        if (role != null && !role.trim().isEmpty()) {
+            try {
+                Role userRole = Role.valueOf(role.trim().toUpperCase());
+                return userRepository.findByRole(userRole, pageable);
+            } catch (IllegalArgumentException e) {
+                // Return empty page or throw exception. Here we return empty/default or ignore filter.
+            }
+        }
         return userRepository.findAll(pageable);
     }
 }
+

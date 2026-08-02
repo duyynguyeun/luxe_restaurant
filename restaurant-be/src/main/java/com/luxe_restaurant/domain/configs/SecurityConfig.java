@@ -2,6 +2,7 @@ package com.luxe_restaurant.domain.configs;
 
 import com.luxe_restaurant.domain.services.jwt.UserCustomizeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -74,10 +75,12 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
     @Bean
     public JwtDecoder jwtDecoder() {
-        String key = "79a6404a6bb4a8bf6f3912a5b652fcc2ea2c153a1dfc5f5772acb525916599be979414c7a757b890205093dde9a68ea0d127e514823e54c4260835b70c3dd8a6"; // <-- Phải dùng chung khóa này
-        SecretKey secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HS512");
+        SecretKey secretKey = new SecretKeySpec(jwtSecret.getBytes(StandardCharsets.UTF_8), "HS512");
         return NimbusJwtDecoder.withSecretKey(secretKey)
                 .macAlgorithm(MacAlgorithm.HS512)
                 .build();

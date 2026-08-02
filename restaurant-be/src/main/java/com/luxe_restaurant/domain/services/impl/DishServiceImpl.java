@@ -4,6 +4,8 @@ import com.luxe_restaurant.app.requests.dish.DishRequest;
 import com.luxe_restaurant.app.responses.dish.DishResponse;
 import com.luxe_restaurant.domain.entities.Category;
 import com.luxe_restaurant.domain.entities.Dish;
+import com.luxe_restaurant.domain.exception.ErrorCode;
+import com.luxe_restaurant.domain.exception.NotFoundException;
 import com.luxe_restaurant.domain.repositories.CategoryRepository;
 import com.luxe_restaurant.domain.repositories.DishRepository;
 import com.luxe_restaurant.domain.services.DishService;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +40,7 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public DishResponse createDish(DishRequest dishRequest) {
-        // Tìm danh mục, nếu không thấy thì để null (không báo lỗi 500)
+        // Tìm danh mục, nếu không thấy thì để null
         Category category = null;
         if (dishRequest.getCategoryId() != null) {
             category = categoryRepository.findById(dishRequest.getCategoryId()).orElse(null);
@@ -53,17 +57,14 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public List<DishResponse> getAllDishes() {
-        return dishRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    public Page<DishResponse> getAllDishes(Pageable pageable) {
+        return dishRepository.findAll(pageable).map(this::mapToResponse);
     }
 
     @Override
     public DishResponse updateDish(Long id, DishRequest dishRequest) {
         Dish dish = dishRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dish Not Found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.DISH_001));
 
         Category category = null;
         if (dishRequest.getCategoryId() != null) {
@@ -83,23 +84,23 @@ public class DishServiceImpl implements DishService {
     @Override
     public void deleteDish(Long id) {
         Dish dish = dishRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dish Not Found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.DISH_001));
         dishRepository.delete(dish);
     }
 
     @Override
     public DishResponse getDishById(Long id) {
         Dish dish = dishRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dish Not Found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.DISH_001));
         return mapToResponse(dish);
     }
 
     @Override
     public DishResponse toggleDishStatus(Long id) {
         Dish dish = dishRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Dish Not Found"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.DISH_001));
         dish.setActive(!dish.isActive()); 
         Dish updatedDish = dishRepository.save(dish);
         return mapToResponse(updatedDish);
     }
-}
+}

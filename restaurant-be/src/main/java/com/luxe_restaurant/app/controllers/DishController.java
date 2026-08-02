@@ -23,8 +23,9 @@ public class DishController {
     }
 
     @GetMapping("/getall")
-    public List<DishResponse> getAllDishes(){
-        return dishService.getAllDishes();
+    public com.luxe_restaurant.app.responses.page.PageResponse<DishResponse> getAllDishes(
+            @org.springframework.data.web.PageableDefault(size = 1000, page = 0) org.springframework.data.domain.Pageable pageable){
+        return new com.luxe_restaurant.app.responses.page.PageResponse<>(dishService.getAllDishes(pageable));
     }
 
     @PutMapping("/update/{id}")
