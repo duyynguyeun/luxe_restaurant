@@ -11,6 +11,15 @@ const AdminManageUsers = () => {
   const [users, setUsers] = useState([]);
   const { currentUser } = useAuth();
   
+  // State phân trang
+  const [currentPage, setCurrentPage] = useState(0);
+  const [metadata, setMetadata] = useState({
+    totalElements: 0,
+    totalPages: 1,
+    pageNumber: 0,
+    pageSize: 5
+  });
+
   // State cho Modal
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,18 +34,28 @@ const AdminManageUsers = () => {
     role: 'CUSTOMER' 
   });
 
-  // 1. Tải danh sách người dùng (Giữ nguyên)
-  const fetchUsers = async () => {
+  // 1. Tải danh sách người dùng
+  const fetchUsers = async (page = 0) => {
     try {
-      const res = await fetch(`${API_URL}/api/user/getall`, {
+      const res = await fetch(`${API_URL}/api/user/getall?page=${page}&size=5`, {
         headers: { 'Authorization': `Bearer ${currentUser.token}` }
       });
-      if (res.ok) setUsers(await res.json());
-      else toast.error("Không thể tải danh sách người dùng.");
-    } catch (err) { console.error(err); toast.error("Lỗi kết nối Server."); }
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.content || []);
+        if (data.metadata) {
+          setMetadata(data.metadata);
+        }
+      } else {
+        toast.error("Không thể tải danh sách người dùng.");
+      }
+    } catch (err) { 
+      console.error(err); 
+      toast.error("Lỗi kết nối Server."); 
+    }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => { fetchUsers(currentPage); }, [currentPage]);
 
   // 2. Xóa người dùng (Giữ nguyên)
   const handleDelete = async (id) => {
@@ -48,7 +67,7 @@ const AdminManageUsers = () => {
         });
         if (response.ok) {
             toast.success("Đã xóa người dùng.");
-            fetchUsers(); 
+            fetchUsers(currentPage); 
         } else {
             toast.error("Không thể xóa người dùng.");
         }
@@ -103,7 +122,7 @@ const AdminManageUsers = () => {
         if (response.ok) {
             toast.success('Cập nhật người dùng thành công!');
             setIsFormModalOpen(false);
-            fetchUsers();
+            fetchUsers(currentPage);
         } else {
             const errorText = await response.text();
             toast.error(errorText || 'Lỗi khi cập nhật.');
@@ -165,6 +184,37 @@ const AdminManageUsers = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* PHÂN TRANG */}
+      <div className="flex justify-between items-center mt-6">
+        <span className="text-sm text-gray-600 font-semibold">
+          Hiển thị trang {metadata.pageNumber + 1} / {metadata.totalPages} ({metadata.totalElements} người dùng)
+        </span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              if (currentPage > 0) {
+                setCurrentPage(currentPage - 1);
+              }
+            }}
+            disabled={currentPage === 0}
+            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
+          >
+            Trước
+          </button>
+          <button
+            onClick={() => {
+              if (currentPage < metadata.totalPages - 1) {
+                setCurrentPage(currentPage + 1);
+              }
+            }}
+            disabled={currentPage >= metadata.totalPages - 1}
+            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
+          >
+            Sau
+          </button>
+        </div>
       </div>
 
       {/* MODAL SỬA NGƯỜI DÙNG */}

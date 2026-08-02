@@ -8,8 +8,17 @@ const AdminManageOrders = () => {
   const [error, setError] = useState(null);
   const { currentUser } = useAuth();
 
+  // State phân trang
+  const [currentPage, setCurrentPage] = useState(0);
+  const [metadata, setMetadata] = useState({
+    totalElements: 0,
+    totalPages: 1,
+    pageNumber: 0,
+    pageSize: 10
+  });
+
   // Lấy danh sách đơn từ Backend
-  const fetchOrders = async () => {
+  const fetchOrders = async (page = 0) => {
     console.log('=== fetchOrders Debug ===');
     console.log('currentUser:', currentUser);
     console.log('currentUser.token exists:', !!currentUser?.token);
@@ -22,7 +31,7 @@ const AdminManageOrders = () => {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = `${import.meta.env.VITE_API_URL || ''}/api/orders/getall`;
+      const apiUrl = `${import.meta.env.VITE_API_URL || ''}/api/orders/getall?page=${page}&size=10&sort=id,desc`;
       const token = currentUser.token;
       
       console.log('Fetching from:', apiUrl);
@@ -43,9 +52,10 @@ const AdminManageOrders = () => {
       if (res.ok) {
         const data = await res.json();
         console.log('Orders fetched successfully:', data);
-        // Handle Spring Data Page response - extract content array
-        const orderList = data.content ? data.content.reverse() : (Array.isArray(data) ? data.reverse() : []);
-        setOrders(orderList);
+        setOrders(data.content || []);
+        if (data.metadata) {
+          setMetadata(data.metadata);
+        }
         setError(null);
       } else {
         const errorText = await res.text();
@@ -73,16 +83,16 @@ const AdminManageOrders = () => {
   };
 
   useEffect(() => { 
-    fetchOrders();
+    fetchOrders(currentPage);
     // Lắng nghe sự kiện làm mới dữ liệu từ AdminLayout
     const handleRefresh = (event) => {
       if (event.detail === 'ORDER' || event.detail === 'ORDERS') {
-        fetchOrders();
+        fetchOrders(currentPage);
       }
     };
     window.addEventListener('REFRESH_ADMIN_DATA', handleRefresh);
     return () => window.removeEventListener('REFRESH_ADMIN_DATA', handleRefresh);
-  }, [currentUser?.token]);
+  }, [currentUser?.token, currentPage]);
 
   // Cập nhật trạng thái đơn
   const updateStatus = async (id, newStatus) => {
@@ -103,7 +113,7 @@ const AdminManageOrders = () => {
       
       if (res.ok) {
         toast.success(`Cập nhật trạng thái thành công!`);
-        await fetchOrders();
+        await fetchOrders(currentPage);
       } else {
         const errorMsg = `Cập nhật thất bại: HTTP ${res.status}`;
         console.error(errorMsg);
@@ -323,8 +333,38 @@ const AdminManageOrders = () => {
               </tr>
             ))}
           </tbody>
-
         </table>
+      </div>
+
+      {/* PHÂN TRANG */}
+      <div className="flex justify-between items-center mt-6">
+        <span className="text-sm text-gray-600 font-semibold">
+          Hiển thị trang {metadata.pageNumber + 1} / {metadata.totalPages} ({metadata.totalElements} đơn hàng)
+        </span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              if (currentPage > 0) {
+                setCurrentPage(currentPage - 1);
+              }
+            }}
+            disabled={currentPage === 0}
+            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
+          >
+            Trước
+          </button>
+          <button
+            onClick={() => {
+              if (currentPage < metadata.totalPages - 1) {
+                setCurrentPage(currentPage + 1);
+              }
+            }}
+            disabled={currentPage >= metadata.totalPages - 1}
+            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
+          >
+            Sau
+          </button>
+        </div>
       </div>
     </div>
   );

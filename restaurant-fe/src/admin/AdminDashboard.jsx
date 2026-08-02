@@ -15,18 +15,19 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const dishRes = await fetch(`${import.meta.env.VITE_API_URL}/api/dish/getall`);
-        const dishes = dishRes.ok ? await dishRes.json() : [];
+        const dishData = dishRes.ok ? await dishRes.json() : {};
+        const totalDishes = dishData.metadata?.totalElements || (dishData.content ? dishData.content.length : (Array.isArray(dishData) ? dishData.length : 0));
 
         const userRes = await fetch(`${import.meta.env.VITE_API_URL}/api/user/getall`, {
             headers: { 'Authorization': `Bearer ${currentUser?.token}` }
         });
-        const users = userRes.ok ? await userRes.json() : [];
+        const userData = userRes.ok ? await userRes.json() : {};
+        const totalUsers = userData.metadata?.totalElements || (userData.content ? userData.content.length : (Array.isArray(userData) ? userData.length : 0));
 
         const orderRes = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/getall`, {
             headers: { 'Authorization': `Bearer ${currentUser?.token}` }
         });
         const orderData = orderRes.ok ? await orderRes.json() : {};
-        // Handle Spring Data Page response - extract content array
         const orders = orderData.content ? orderData.content : (Array.isArray(orderData) ? orderData : []);
 
         const todayStr = new Date().toISOString().split('T')[0];
@@ -35,8 +36,8 @@ const AdminDashboard = () => {
         ).length;
 
         setStats({
-          totalDishes: dishes.length,
-          totalUsers: users.length,
+          totalDishes,
+          totalUsers,
           ordersToday: countOrdersToday
         });
 

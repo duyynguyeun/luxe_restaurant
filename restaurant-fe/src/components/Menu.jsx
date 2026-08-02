@@ -21,9 +21,10 @@ const Menu = () => {
         setIsLoading(true);
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dish/getall`);
         const data = await response.json();
+        const dishes = data.content ? data.content : (Array.isArray(data) ? data : []);
 
         // Chỉ lấy món đang BẬT (Active)
-        const activeDishes = data.filter(item => item.active === true);
+        const activeDishes = dishes.filter(item => item.active === true);
         
         setOriginalMenu(activeDishes); // Lưu bản gốc
       } catch (error) {

@@ -9,12 +9,20 @@ const AdminManageMenu = () => {
   const [categories, setCategories] = useState([]); // State lưu danh mục
   const { currentUser } = useAuth(); 
 
+  // State phân trang
+  const [currentPage, setCurrentPage] = useState(0);
+  const [metadata, setMetadata] = useState({
+    totalElements: 0,
+    totalPages: 1,
+    pageNumber: 0,
+    pageSize: 10
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false); 
   const [currentDishId, setCurrentDishId] = useState(null);
-  // ... các state cũ (menuItems, isModalOpen, ...)
-  const [isUploading, setIsUploading] = useState(false); // <--- State mới để theo dõi quá trình upload
+  const [isUploading, setIsUploading] = useState(false); 
 
   // --- HÀM UPLOAD ẢNH ---
   const handleUploadImage = async (e) => {
@@ -54,21 +62,27 @@ const AdminManageMenu = () => {
   });
 
   // --- Tải dữ liệu ---
-  const fetchData = async () => {
+  const fetchData = async (page = 0) => {
     try {
       const [dishRes, catRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/api/dish/getall`),
+        fetch(`${import.meta.env.VITE_API_URL}/api/dish/getall?page=${page}&size=10`),
         fetch(`${import.meta.env.VITE_API_URL}/api/category/getall`)
       ]);
 
-      if (dishRes.ok) setMenuItems((await dishRes.json()).reverse());
+      if (dishRes.ok) {
+        const data = await dishRes.json();
+        setMenuItems(data.content || []);
+        if (data.metadata) {
+          setMetadata(data.metadata);
+        }
+      }
       if (catRes.ok) setCategories(await catRes.json());
     } catch (error) {
       console.error("Lỗi kết nối:", error);
     }
   };
 
-  useEffect(() => { fetchData(); }, []); 
+  useEffect(() => { fetchData(currentPage); }, [currentPage]); 
 
   const handleToggle = async (id) => {
     try {
@@ -89,7 +103,7 @@ const AdminManageMenu = () => {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${currentUser.token}` }
         });
-        if (response.ok) fetchData();
+        if (response.ok) fetchData(currentPage);
       } catch (error) { console.error(error); }
     }
   };
@@ -147,7 +161,7 @@ const AdminManageMenu = () => {
       if (response.ok) {
         toast.success(isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!');
         setIsModalOpen(false);
-        fetchData();
+        fetchData(currentPage);
       } else {
         toast.error('Lỗi! Mã: ' + response.status);
       }
@@ -200,6 +214,37 @@ const AdminManageMenu = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* PHÂN TRANG */}
+      <div className="flex justify-between items-center mt-6">
+        <span className="text-sm text-gray-600 font-semibold">
+          Hiển thị trang {metadata.pageNumber + 1} / {metadata.totalPages} ({metadata.totalElements} món ăn)
+        </span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              if (currentPage > 0) {
+                setCurrentPage(currentPage - 1);
+              }
+            }}
+            disabled={currentPage === 0}
+            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
+          >
+            Trước
+          </button>
+          <button
+            onClick={() => {
+              if (currentPage < metadata.totalPages - 1) {
+                setCurrentPage(currentPage + 1);
+              }
+            }}
+            disabled={currentPage >= metadata.totalPages - 1}
+            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
+          >
+            Sau
+          </button>
+        </div>
       </div>
 
       {isModalOpen && (

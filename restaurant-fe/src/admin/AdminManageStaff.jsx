@@ -9,6 +9,15 @@ const AdminManageStaff = () => {
   const [staffs, setStaffs] = useState([]);
   const { currentUser } = useAuth();
   
+  // State phân trang
+  const [currentPage, setCurrentPage] = useState(0);
+  const [metadata, setMetadata] = useState({
+    totalElements: 0,
+    totalPages: 1,
+    pageNumber: 0,
+    pageSize: 5
+  });
+
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -23,16 +32,17 @@ const AdminManageStaff = () => {
   });
 
   // 1. Lấy danh sách nhân viên
-  const fetchStaffs = async () => {
+  const fetchStaffs = async (page = 0) => {
     try {
-      const res = await fetch(`${API_URL}/api/user/getall`, {
+      const res = await fetch(`${API_URL}/api/user/getall?role=STAFF&page=${page}&size=5`, {
         headers: { 'Authorization': `Bearer ${currentUser.token}` }
       });
       if (res.ok) {
-        const allUsers = await res.json();
-        // Lọc chỉ lấy tài khoản STAFF
-        const staffList = allUsers.filter(u => u.role === 'STAFF');
-        setStaffs(staffList);
+        const data = await res.json();
+        setStaffs(data.content || []);
+        if (data.metadata) {
+          setMetadata(data.metadata);
+        }
       }
     } catch (err) { 
         console.error(err); 
@@ -40,7 +50,7 @@ const AdminManageStaff = () => {
     }
   };
 
-  useEffect(() => { fetchStaffs(); }, []);
+  useEffect(() => { fetchStaffs(currentPage); }, [currentPage]);
 
   //  2. XÓA NHÂN VIÊN 
   const handleDelete = async (id) => {
@@ -52,7 +62,7 @@ const AdminManageStaff = () => {
         });
         if (response.ok) {
             toast.success("Đã xóa nhân viên.");
-            fetchStaffs(); 
+            fetchStaffs(currentPage); 
         } else {
             toast.error("Không thể xóa nhân viên này.");
         }
@@ -114,7 +124,7 @@ const AdminManageStaff = () => {
         if (response.ok) {
             toast.success(isEditing ? 'Cập nhật thông tin thành công!' : 'Thêm nhân viên mới thành công!');
             setIsFormModalOpen(false);
-            fetchStaffs();
+            fetchStaffs(currentPage);
         } else {
             const txt = await response.text();
             toast.error(txt || "Lỗi xử lý.");
@@ -178,6 +188,37 @@ const AdminManageStaff = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* PHÂN TRANG */}
+      <div className="flex justify-between items-center mt-6">
+        <span className="text-sm text-gray-600 font-semibold">
+          Hiển thị trang {metadata.pageNumber + 1} / {metadata.totalPages} ({metadata.totalElements} nhân viên)
+        </span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              if (currentPage > 0) {
+                setCurrentPage(currentPage - 1);
+              }
+            }}
+            disabled={currentPage === 0}
+            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
+          >
+            Trước
+          </button>
+          <button
+            onClick={() => {
+              if (currentPage < metadata.totalPages - 1) {
+                setCurrentPage(currentPage + 1);
+              }
+            }}
+            disabled={currentPage >= metadata.totalPages - 1}
+            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
+          >
+            Sau
+          </button>
+        </div>
       </div>
 
       {/* MODAL FORM */}
