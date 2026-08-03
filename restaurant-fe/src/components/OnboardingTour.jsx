@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Joyride, { STATUS } from 'react-joyride';
 import { FaQuestion, FaChevronRight, FaChevronLeft, FaTimes, FaCheck } from 'react-icons/fa';
 
@@ -22,6 +23,12 @@ const CustomButton = ({ children, onClick, variant = 'primary', icon: Icon, ...p
 
 const OnboardingTour = () => {
   const [run, setRun] = useState(false);
+  const location = useLocation();
+
+  // Nút Hướng dẫn ? chỉ xuất hiện ở trang chủ '/' (không xuất hiện ở Admin hay các trang khác)
+  if (location.pathname !== '/') {
+    return null;
+  }
 
   const steps = [
     {
@@ -197,13 +204,13 @@ const OnboardingTour = () => {
         )}
       />
 
-      {/* Nút dấu hỏi kích hoạt tour (Giữ nguyên hoặc chỉnh sửa thêm) */}
+      {/* Nút dấu hỏi kích hoạt tour - Nhỏ gọn, sang trọng hợp theme trang chủ */}
       <button
         onClick={() => setRun(true)}
-        className="fixed bottom-24 left-6 z-50 w-14 h-14 bg-gradient-to-br from-yellow-400 to-yellow-600 text-[#174C34] rounded-full shadow-[0_8px_20px_-5px_rgba(234,179,8,0.5)] flex items-center justify-center text-2xl hover:scale-110 transition-all cursor-pointer animate-bounce-slow border-2 border-white/50"
+        className="fixed bottom-6 left-6 z-50 w-11 h-11 bg-gradient-to-br from-[#174C34] to-[#0d2e1f] text-amber-300 rounded-full shadow-xl border border-amber-400/40 flex items-center justify-center text-lg hover:scale-110 hover:border-amber-300 transition-all duration-300 cursor-pointer"
         title="Hướng dẫn sử dụng"
       >
-        <FaQuestion className="filter drop-shadow-sm" />
+        <FaQuestion className="filter drop-shadow-xs" />
       </button>
     </>
   );

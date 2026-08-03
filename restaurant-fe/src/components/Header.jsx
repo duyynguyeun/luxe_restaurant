@@ -20,21 +20,20 @@ const Header = () => {
     
   
     <header className="bg-[#174C34] shadow-md sticky top-0 z-50 font-sans">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div className="w-full max-w-[1500px] mx-auto px-6 sm:px-8 py-4 flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="block w-48 hover:opacity-90 transition-opacity">
+        <Link to="/" className="block w-44 sm:w-48 hover:opacity-90 transition-opacity">
           <img className="h-12 w-auto object-contain" src={logo} alt="Luxe Restaurant Logo" />
         </Link>
 
-        {/* Menu */}
-        <nav>
-          <ul className="flex space-x-8 font-medium items-center text-white text-base">
+        {/* Menu Navigation */}
+        <nav className="flex-1 flex items-center justify-between">
+          {/* Các tab chuyển trang ở giữa - Căn giữa chuẩn giữa Logo và Cụm bên phải */}
+          <ul className="flex space-x-6 lg:space-x-8 font-medium items-center text-white text-base mx-auto">
             <li>
-              {/* Thêm class 'tour-home' */}
               <Link to="/" className="tour-home hover:text-yellow-400 transition-colors duration-300">{t('home')}</Link>
             </li>
             <li>
-              {/* Thêm class 'tour-menu' */}
               <Link to="/menu" className="tour-menu hover:text-yellow-400 transition-colors duration-300">{t('menu')}</Link>
             </li>
             <li>
@@ -43,22 +42,20 @@ const Header = () => {
             <li>
               <Link to="/contactPage" className="hover:text-yellow-400 transition-colors duration-300">{t('about')}</Link>
             </li>
-            
             <li>
-              {/* Thêm class 'tour-cart' */}
               <Link to="/cart" className="tour-cart hover:text-yellow-400 transition-colors duration-300">{t('cart')}</Link>
             </li>
             <li>
-              {/* Thêm class 'tour-orders' */}
               <Link to="/my-orders" className="tour-orders hover:text-yellow-400 transition-colors duration-300">{t('orders')}</Link>
             </li>
-               
-            {/* PHẦN TÀI KHOẢN */}
-            {/* Thêm class 'tour-auth' bao quanh khu vực này */}
+          </ul>
+
+          {/* Cụm Tài khoản (Đăng nhập/Đăng ký) + Đa ngôn ngữ nằm ở sát góc bên phải */}
+          <div className="flex items-center gap-5 sm:gap-6">
             <div className="tour-auth">
               {currentUser ? (
-                  <li className="relative group list-none"> {/* list-none để bỏ chấm tròn nếu có */}
-                  <button className="flex items-center gap-2 py-2 text-white hover:text-yellow-300 transition-colors focus:outline-none">
+                <div className="relative group">
+                  <button className="flex items-center gap-2 py-2 text-white hover:text-yellow-300 transition-colors focus:outline-none cursor-pointer">
                     <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-[#174C34]">
                       <FaUserCircle size={20} />
                     </div>
@@ -66,7 +63,7 @@ const Header = () => {
                     <FaCaretDown className="text-xs transition-transform duration-300 group-hover:rotate-180" />
                   </button>
 
-                  <div className="absolute right-0 top-full pt-3 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform group-hover:translate-y-0 translate-y-2 transition-all duration-300 ease-out">
+                  <div className="absolute right-0 top-full pt-3 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform group-hover:translate-y-0 translate-y-2 transition-all duration-300 ease-out z-50">
                     <div className="bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden relative">
                       <div className="absolute top-0 right-6 w-4 h-4 bg-white transform -translate-y-1/2 rotate-45 border-l border-t border-gray-100"></div>
                       <div className="relative z-10 bg-white">
@@ -79,7 +76,7 @@ const Header = () => {
                             <FaUserEdit className="text-lg" />
                             <span>{t('edit_profile')}</span>
                           </Link>
-                          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors mt-1">
+                          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors mt-1 cursor-pointer">
                             <FaSignOutAlt className="text-lg" />
                             <span>{t('logout')}</span>
                           </button>
@@ -87,20 +84,19 @@ const Header = () => {
                       </div>
                     </div>
                   </div>
-                </li>
+                </div>
               ) : (
-                <div className="flex items-center gap-4 ml-4">
+                <div className="flex items-center gap-4">
                   <Link to="/login" className="text-white hover:text-yellow-300 font-medium transition-colors">{t('login')}</Link>
                   <Link to="/signup" className="bg-yellow-500 text-[#174C34] px-5 py-2 rounded-full font-bold hover:bg-yellow-400 shadow-lg transform hover:-translate-y-0.5 transition-all">{t('signup')}</Link>
                 </div>
               )}
             </div>
-          </ul>
+
+            {/* Nút Đa Ngôn Ngữ */}
+            <LanguageSwitcher />
+          </div>
         </nav>
-        {/* Language toggle */}
-        <div className="absolute right-6 top-4">
-          <LanguageSwitcher />
-        </div>
       </div>
     </header>
   );

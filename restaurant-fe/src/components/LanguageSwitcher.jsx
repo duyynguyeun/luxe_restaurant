@@ -1,29 +1,29 @@
 import React from 'react';
+import { FaGlobe } from 'react-icons/fa';
 import { useLanguage } from '../i18n/LanguageProvider';
 
 const LanguageSwitcher = ({ className = '' }) => {
   const { lang, setLang } = useLanguage();
 
-  return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <button
-        onClick={() => setLang('vi')}
-        aria-label="Tiếng Việt"
-        className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-all focus:ring-2 focus:ring-amber-300 ${lang === 'vi' ? 'bg-amber-400 text-[#174C34]' : 'bg-white/10 text-white hover:bg-white/20'}`}
-      >
-        <span className="text-sm">🇻🇳</span>
-        <span className="hidden sm:inline">VI</span>
-      </button>
+  const toggleLanguage = () => {
+    setLang(lang === 'vi' ? 'en' : 'vi');
+  };
 
-      <button
-        onClick={() => setLang('en')}
-        aria-label="English"
-        className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium transition-all focus:ring-2 focus:ring-amber-300 ${lang === 'en' ? 'bg-amber-400 text-[#174C34]' : 'bg-white/10 text-white hover:bg-white/20'}`}
-      >
-        <span className="text-sm">🇺🇸</span>
-        <span className="hidden sm:inline">EN</span>
-      </button>
-    </div>
+  return (
+    <button
+      onClick={toggleLanguage}
+      aria-label="Chuyển đổi ngôn ngữ"
+      title={lang === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
+      className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-amber-400/50 text-white transition-all duration-300 cursor-pointer group shadow-xs ${className}`}
+    >
+      <FaGlobe className="text-base text-amber-300 group-hover:rotate-45 transition-transform duration-500" />
+      <span className="font-bold text-xs tracking-wider uppercase">
+        {lang === 'vi' ? 'VI' : 'EN'}
+      </span>
+      <span className="text-xs opacity-80">
+        {lang === 'vi' ? '🇻🇳' : '🇺🇸'}
+      </span>
+    </button>
   );
 };
 
