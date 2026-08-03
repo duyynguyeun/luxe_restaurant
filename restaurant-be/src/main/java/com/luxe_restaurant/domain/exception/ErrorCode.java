@@ -58,6 +58,22 @@ public enum ErrorCode {
     CLOUDINARY_001("CLOUDINARY_001", "Tải hình ảnh lên hệ thống Cloudinary thất bại!", HttpStatus.INTERNAL_SERVER_ERROR),
     MAIL_001("MAIL_001", "Gửi email thông báo/mã OTP thất bại!", HttpStatus.INTERNAL_SERVER_ERROR),
 
+    // INGREDIENT & RECIPE & INVENTORY
+    INGREDIENT_001("INGREDIENT_001", "Không tìm thấy nguyên liệu!", HttpStatus.NOT_FOUND),
+    INGREDIENT_002("INGREDIENT_002", "Mã nguyên liệu đã tồn tại!", HttpStatus.CONFLICT),
+    INGREDIENT_003("INGREDIENT_003", "Nguyên liệu hiện đang ngưng hoạt động!", HttpStatus.BAD_REQUEST),
+    INGREDIENT_004("INGREDIENT_004", "Không thể xóa nguyên liệu đã có lịch sử hoặc công thức!", HttpStatus.BAD_REQUEST),
+    INVALID_UNIT_CONVERSION("INV_UNIT_001", "Không thể quy đổi giữa hai đơn vị không tương thích!", HttpStatus.BAD_REQUEST),
+    INVALID_QUANTITY("INV_QTY_001", "Số lượng phải lớn hơn 0!", HttpStatus.BAD_REQUEST),
+    DUPLICATE_RECIPE_INGREDIENT("RECIPE_001", "Công thức món ăn không được chứa nguyên liệu trùng lặp!", HttpStatus.BAD_REQUEST),
+    RECIPE_NOT_CONFIGURED("RECIPE_002", "Món ăn chưa được cấu hình công thức nguyên liệu!", HttpStatus.BAD_REQUEST),
+    INVENTORY_TRANSACTION_NOT_FOUND("INV_TX_001", "Không tìm thấy phiếu giao dịch kho!", HttpStatus.NOT_FOUND),
+    INVENTORY_TRANSACTION_ALREADY_CONFIRMED("INV_TX_002", "Phiếu giao dịch kho đã được xác nhận trước đó!", HttpStatus.BAD_REQUEST),
+    INSUFFICIENT_STOCK("STOCK_001", "Số lượng tồn kho không đủ để thực hiện thao tác!", HttpStatus.BAD_REQUEST),
+    ORDER_STOCK_ALREADY_DEDUCTED("STOCK_002", "Đơn hàng này đã được trừ kho trước đó!", HttpStatus.BAD_REQUEST),
+    ORDER_STOCK_NOT_DEDUCTED("STOCK_003", "Đơn hàng chưa từng được trừ kho nên không thể hoàn kho!", HttpStatus.BAD_REQUEST),
+    INVENTORY_CONCURRENT_UPDATE("STOCK_004", "Dữ liệu kho đã thay đổi bởi thao tác khác, vui lòng thử lại!", HttpStatus.CONFLICT),
+
     // SYSTEM & VALIDATION
     SYS_001("SYS_001", "Lỗi hệ thống nội bộ, vui lòng liên hệ quản trị viên!", HttpStatus.INTERNAL_SERVER_ERROR),
     SYS_002("SYS_002", "Dữ liệu yêu cầu gửi lên không hợp lệ!", HttpStatus.BAD_REQUEST),
