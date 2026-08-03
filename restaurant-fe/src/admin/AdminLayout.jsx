@@ -17,10 +17,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Component Link cải tiến với Active state giả lập và Hover đẹp hơn
-const SidebarLink = ({ to, icon, label }) => {
+const SidebarLink = ({ to, icon, label, exact = false }) => {
   const location = useLocation();
-  // Kiểm tra xem link có đang active không (đơn giản hoá logic match path)
-  const isActive = location.pathname === to || (to !== '/admin' && location.pathname.startsWith(to));
+  // Route tổng quan (/admin, /admin/inventory) hoặc khi truyền exact={true} chỉ active khi match chính xác URL
+  const isExactTarget = exact || to === '/admin' || to === '/admin/inventory';
+  const isActive = isExactTarget
+    ? (location.pathname === to || location.pathname === `${to}/`)
+    : (location.pathname === to || location.pathname.startsWith(`${to}/`));
 
   return (
     <Link
@@ -102,7 +105,7 @@ const AdminLayout = () => {
         </div>
 
         <nav className="flex-grow px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
-          <SidebarLink to="/admin" icon={<MdDashboard />} label="Dashboard" />
+          <SidebarLink to="/admin" icon={<MdDashboard />} label="Dashboard" exact />
           <SidebarLink to="/admin/menu" icon={<MdFastfood />} label="Quản lý Món ăn" />
           <SidebarLink to="/admin/orders" icon={<MdShoppingBag />} label="Quản lý Đơn hàng" />
           <SidebarLink to="/admin/reservations" icon={<MdEventSeat />} label="Quản lý Đặt bàn" />
@@ -110,7 +113,7 @@ const AdminLayout = () => {
           {/* NHÓM VẬT TƯ & QUẢN LÝ KHO */}
           <div className="pt-4 mt-4 border-t border-slate-100">
             <p className="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Quản lý kho nguyên liệu</p>
-            <SidebarLink to="/admin/inventory" icon={<MdDashboard />} label="Tổng quan kho" />
+            <SidebarLink to="/admin/inventory" icon={<MdDashboard />} label="Tổng quan kho" exact />
             <SidebarLink to="/admin/inventory/ingredients" icon={<MdFastfood />} label="Danh mục Nguyên liệu" />
             <SidebarLink to="/admin/inventory/import" icon={<MdLocalOffer />} label="Lập Phiếu Nhập" />
             <SidebarLink to="/admin/inventory/export" icon={<MdLocalOffer />} label="Lập Phiếu Xuất" />

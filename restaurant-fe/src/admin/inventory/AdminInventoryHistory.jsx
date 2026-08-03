@@ -6,6 +6,7 @@ import {
   FaHistory, FaSearch, FaEye, FaCheckCircle, FaTruck, FaSignOutAlt, 
   FaSync, FaTimes, FaPlus 
 } from 'react-icons/fa';
+import Pagination from '../../components/Pagination';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -283,29 +284,16 @@ const AdminInventoryHistory = () => {
         </div>
 
         {/* Pagination */}
-        {metadata.totalPages > 1 && (
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">
-              Trang {metadata.pageNumber + 1} / {metadata.totalPages} ({metadata.totalElements} phiếu)
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                disabled={currentPage === 0}
-                onClick={() => setCurrentPage(prev => prev - 1)}
-                className="px-3.5 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-50 transition-all"
-              >
-                Trang trước
-              </button>
-              <button
-                disabled={currentPage >= metadata.totalPages - 1}
-                onClick={() => setCurrentPage(prev => prev + 1)}
-                className="px-3.5 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-100 disabled:opacity-50 transition-all"
-              >
-                Trang sau
-              </button>
-            </div>
-          </div>
-        )}
+        <div className="px-6 py-2 bg-slate-50 border-t border-slate-200">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={metadata.totalPages}
+            totalElements={metadata.totalElements}
+            pageSize={metadata.pageSize || 10}
+            itemsCount={transactions.length}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </div>
       </div>
 
       {/* Modal Detail Transaction */}

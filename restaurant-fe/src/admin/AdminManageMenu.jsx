@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { FaDollarSign, FaTag, FaImage, FaTimes, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaList, FaUtensils } from 'react-icons/fa';
 import RecipeModal from './components/RecipeModal';
+import Pagination from '../components/Pagination';
 
 
 const AdminManageMenu = () => {
@@ -232,34 +233,16 @@ const AdminManageMenu = () => {
       </div>
 
       {/* PHÂN TRANG */}
-      <div className="flex justify-between items-center mt-6">
-        <span className="text-sm text-gray-600 font-semibold">
-          Hiển thị trang {metadata.pageNumber + 1} / {metadata.totalPages} ({metadata.totalElements} món ăn)
-        </span>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              if (currentPage > 0) {
-                setCurrentPage(currentPage - 1);
-              }
-            }}
-            disabled={currentPage === 0}
-            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
-          >
-            Trước
-          </button>
-          <button
-            onClick={() => {
-              if (currentPage < metadata.totalPages - 1) {
-                setCurrentPage(currentPage + 1);
-              }
-            }}
-            disabled={currentPage >= metadata.totalPages - 1}
-            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
-          >
-            Sau
-          </button>
-        </div>
+      <div className="mt-4 bg-white p-2 rounded-xl shadow-xs border border-slate-100">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={metadata.totalPages}
+          totalElements={metadata.totalElements}
+          pageSize={metadata.pageSize || 10}
+          itemsCount={menuItems.length}
+          itemLabel="món ăn"
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
 
       {isModalOpen && (
