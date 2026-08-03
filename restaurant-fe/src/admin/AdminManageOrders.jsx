@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import Pagination from '../components/Pagination';
 
 const AdminManageOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -337,34 +338,16 @@ const AdminManageOrders = () => {
       </div>
 
       {/* PHÂN TRANG */}
-      <div className="flex justify-between items-center mt-6">
-        <span className="text-sm text-gray-600 font-semibold">
-          Hiển thị trang {metadata.pageNumber + 1} / {metadata.totalPages} ({metadata.totalElements} đơn hàng)
-        </span>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              if (currentPage > 0) {
-                setCurrentPage(currentPage - 1);
-              }
-            }}
-            disabled={currentPage === 0}
-            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
-          >
-            Trước
-          </button>
-          <button
-            onClick={() => {
-              if (currentPage < metadata.totalPages - 1) {
-                setCurrentPage(currentPage + 1);
-              }
-            }}
-            disabled={currentPage >= metadata.totalPages - 1}
-            className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-100 disabled:opacity-50 font-semibold cursor-pointer disabled:cursor-not-allowed"
-          >
-            Sau
-          </button>
-        </div>
+      <div className="mt-4 bg-white p-2 rounded-xl shadow-xs border border-slate-100">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={metadata.totalPages}
+          totalElements={metadata.totalElements}
+          pageSize={metadata.pageSize || 10}
+          itemsCount={orders.length}
+          itemLabel="đơn hàng"
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
     </div>
   );
