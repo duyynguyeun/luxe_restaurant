@@ -106,11 +106,24 @@ const AdminLayout = () => {
           <SidebarLink to="/admin/menu" icon={<MdFastfood />} label="Quản lý Món ăn" />
           <SidebarLink to="/admin/orders" icon={<MdShoppingBag />} label="Quản lý Đơn hàng" />
           <SidebarLink to="/admin/reservations" icon={<MdEventSeat />} label="Quản lý Đặt bàn" />
-          <SidebarLink to="/admin/promotions" icon={<MdLocalOffer />} label="Quản lý Ưu đãi" />
-          <SidebarLink to="/admin/reports" icon={<FaEnvelopeOpenText />} label="Phản hồi khách hàng" />
-          
-          <div className="pt-6 mt-6 border-t border-slate-100">
-            <p className="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Tài khoản</p>
+
+          {/* NHÓM VẬT TƯ & QUẢN LÝ KHO */}
+          <div className="pt-4 mt-4 border-t border-slate-100">
+            <p className="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Quản lý kho nguyên liệu</p>
+            <SidebarLink to="/admin/inventory" icon={<MdDashboard />} label="Tổng quan kho" />
+            <SidebarLink to="/admin/inventory/ingredients" icon={<MdFastfood />} label="Danh mục Nguyên liệu" />
+            <SidebarLink to="/admin/inventory/import" icon={<MdLocalOffer />} label="Lập Phiếu Nhập" />
+            <SidebarLink to="/admin/inventory/export" icon={<MdLocalOffer />} label="Lập Phiếu Xuất" />
+            <SidebarLink to="/admin/inventory/history" icon={<FaEnvelopeOpenText />} label="Lịch sử giao dịch" />
+          </div>
+
+          <div className="pt-4 mt-4 border-t border-slate-100">
+            <SidebarLink to="/admin/promotions" icon={<MdLocalOffer />} label="Quản lý Ưu đãi" />
+            <SidebarLink to="/admin/reports" icon={<FaEnvelopeOpenText />} label="Phản hồi khách hàng" />
+          </div>
+
+          <div className="pt-4 mt-4 border-t border-slate-100">
+            <p className="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tài khoản</p>
             <SidebarLink to="/admin/users" icon={<MdPeople />} label="Khách hàng" />
             <SidebarLink to="/admin/staff" icon={<MdBadge />} label="Nhân viên" />
           </div>

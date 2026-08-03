@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext'; 
 import { toast } from 'react-toastify';
-import { FaDollarSign, FaTag, FaImage, FaTimes, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaList } from 'react-icons/fa';
+import { FaDollarSign, FaTag, FaImage, FaTimes, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaList, FaUtensils } from 'react-icons/fa';
+import RecipeModal from './components/RecipeModal';
 
 
 const AdminManageMenu = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]); // State lưu danh mục
   const { currentUser } = useAuth(); 
+
+  // State công thức
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
+  const [selectedRecipeDish, setSelectedRecipeDish] = useState(null);
 
   // State phân trang
   const [currentPage, setCurrentPage] = useState(0);
@@ -207,8 +212,18 @@ const AdminManageMenu = () => {
                   </button>
                 </td>
                 <td className="px-6 py-4 text-center flex justify-center gap-3">
-                  <button onClick={() => openEditModal(item)} className="text-blue-500"><FaEdit /></button>
-                  <button onClick={() => handleDelete(item.id)} className="text-red-500"><FaTrash /></button>
+                  <button
+                    onClick={() => {
+                      setSelectedRecipeDish(item);
+                      setRecipeModalOpen(true);
+                    }}
+                    className="p-1.5 bg-orange-50 text-orange-600 hover:bg-orange-100 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+                    title="Cấu hình công thức nguyên liệu"
+                  >
+                    <FaUtensils /> Công thức
+                  </button>
+                  <button onClick={() => openEditModal(item)} className="text-blue-500 p-1.5 hover:bg-blue-50 rounded-lg" title="Sửa món"><FaEdit /></button>
+                  <button onClick={() => handleDelete(item.id)} className="text-red-500 p-1.5 hover:bg-red-50 rounded-lg" title="Xóa món"><FaTrash /></button>
                 </td>
               </tr>
             ))}
@@ -347,6 +362,19 @@ const AdminManageMenu = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Recipe Modal Component */}
+      {selectedRecipeDish && (
+        <RecipeModal
+          dishId={selectedRecipeDish.id}
+          dishName={selectedRecipeDish.nameDish}
+          isOpen={recipeModalOpen}
+          onClose={() => {
+            setRecipeModalOpen(false);
+            setSelectedRecipeDish(null);
+          }}
+        />
       )}
     </div> 
   );

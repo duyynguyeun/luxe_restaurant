@@ -47,6 +47,13 @@ const AdminManageStaff = lazy(() => import('./admin/AdminManageStaff')); // <---
 const AdminManageReports = lazy(() => import('./admin/AdminManageReports'));
 const AdminManagePromotions = lazy(() => import('./admin/AdminManagePromotions'));
 
+// MODULE KHO NGUYÊN LIỆU
+const AdminInventoryDashboard = lazy(() => import('./admin/inventory/AdminInventoryDashboard'));
+const AdminManageIngredients = lazy(() => import('./admin/inventory/AdminManageIngredients'));
+const AdminInventoryImport = lazy(() => import('./admin/inventory/AdminInventoryImport'));
+const AdminInventoryExport = lazy(() => import('./admin/inventory/AdminInventoryExport'));
+const AdminInventoryHistory = lazy(() => import('./admin/inventory/AdminInventoryHistory'));
+
 
 function App() {
   return (
@@ -73,6 +80,13 @@ function App() {
                   <Route path="staff" element={<AdminManageStaff />} />
                   <Route path="reports" element={<AdminManageReports />} />
                   <Route path="promotions" element={<AdminManagePromotions />} />
+
+                  {/* MODULE KHO NGUYÊN LIỆU ROUTES */}
+                  <Route path="inventory" element={<AdminInventoryDashboard />} />
+                  <Route path="inventory/ingredients" element={<AdminManageIngredients />} />
+                  <Route path="inventory/import" element={<AdminInventoryImport />} />
+                  <Route path="inventory/export" element={<AdminInventoryExport />} />
+                  <Route path="inventory/history" element={<AdminInventoryHistory />} />
                 </Route>
               </Route>
 
