@@ -2,6 +2,7 @@ const translations = {
   vi: {
     home: 'Trang chủ',
     menu: 'Thực đơn',
+    promotions: 'Ưu đãi',
     about: 'Giới thiệu',
     cart: '🛒 Giỏ hàng',
     orders: 'Đơn hàng',
@@ -46,6 +47,7 @@ const translations = {
   en: {
     home: 'Home',
     menu: 'Menu',
+    promotions: 'Promotions',
     about: 'About',
     cart: '🛒 Cart',
     orders: 'Orders',
