@@ -12,6 +12,9 @@ import com.luxe_restaurant.domain.exception.ErrorCode;
 import com.luxe_restaurant.domain.exception.NotFoundException;
 import com.luxe_restaurant.domain.repositories.OrderRepository;
 import com.luxe_restaurant.domain.repositories.UserRepository;
+import com.luxe_restaurant.domain.entities.Dish;
+import com.luxe_restaurant.domain.repositories.DishRepository;
+import com.luxe_restaurant.domain.services.InventoryService;
 import com.luxe_restaurant.domain.services.mail.EmailService;
 import com.luxe_restaurant.domain.services.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +44,10 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final DishRepository dishRepository;
     private final EmailService emailService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final InventoryService inventoryService;
 
     private static final BigDecimal BASE_POINTS = new BigDecimal("100"); 
     private static final BigDecimal MONEY_RATIO = new BigDecimal("1000"); 
@@ -80,11 +85,20 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> details = new ArrayList<>();
         if (request.getItems() != null) {
             for (OrderItemRequest item : request.getItems()) {
+                Dish dish = null;
+                if (item.getDishId() != null) {
+                    dish = dishRepository.findById(item.getDishId()).orElse(null);
+                }
+                if (dish == null && item.getDishName() != null) {
+                    dish = dishRepository.findByNameDish(item.getDishName()).orElse(null);
+                }
+
                 OrderDetail detail = OrderDetail.builder()
                         .dishName(item.getDishName())
                         .quantity(item.getQuantity())
                         .price(item.getPrice())
                         .order(order)
+                        .dish(dish)
                         .build();
                 details.add(detail);
             }
@@ -120,6 +134,13 @@ public class OrderServiceImpl implements OrderService {
         List<OrderStatus> validNext = VALID_TRANSITIONS.get(currentStatus);
         if (validNext == null || !validNext.contains(newStatus)) {
             throw new BusinessException(ErrorCode.ORDER_003, String.format("Không thể chuyển từ %s sang %s", currentStatus, newStatus));
+        }
+
+        // Tích hợp trừ / hoàn kho tự động theo trạng thái đơn hàng
+        if (newStatus == OrderStatus.PAID || newStatus == OrderStatus.PREPARING) {
+            inventoryService.deductStockForOrder(order);
+        } else if (newStatus == OrderStatus.CANCELLED) {
+            inventoryService.returnStockForOrder(order);
         }
 
         order.setStatus(newStatus);
