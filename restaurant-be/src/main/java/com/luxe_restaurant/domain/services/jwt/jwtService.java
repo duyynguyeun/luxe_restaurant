@@ -21,7 +21,7 @@ public class jwtService {
         JWSHeader header =  new JWSHeader(JWSAlgorithm.HS512);
 
         Date issueTime = new Date();
-        Date experedTime = Date.from(issueTime.toInstant().plus(30, ChronoUnit.MINUTES));
+        Date experedTime = Date.from(issueTime.toInstant().plus(7, ChronoUnit.DAYS));
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUserName())
