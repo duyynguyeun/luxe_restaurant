@@ -1,6 +1,17 @@
 -- Flyway Migration Script: V1__init_inventory_schema.sql
 -- Module Quản lý Kho nguyên liệu và Công thức món ăn
 
+-- 0. Bảng món ăn (Đảm bảo bảng dish đã tồn tại để thiết lập FK)
+CREATE TABLE IF NOT EXISTS dish (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name_dish VARCHAR(255) UNIQUE,
+    url_image VARCHAR(255),
+    price DECIMAL(15, 2),
+    des VARCHAR(255),
+    category_id BIGINT,
+    is_active BOOLEAN DEFAULT TRUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- 1. Bảng Nguyên liệu
 CREATE TABLE IF NOT EXISTS ingredients (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
