@@ -65,10 +65,10 @@
     /api/chatbot
     /api/category/getall
 ## Cấu trúc thư mục
-	RESTAURANT/
+
+```text
+RESTAURANT/
 ├── restaurant-be/              # Backend – Spring Boot
-│   ├── .github/                 # GitHub workflows / CI (nếu có)
-│   ├── .idea/                   # Cấu hình IDE
 │   ├── .mvn/                    # Maven wrapper
 │   ├── src/
 │   │   └── main/
@@ -84,31 +84,31 @@
 │   │       │       │   ├── dto/            # DTO dùng nội bộ
 │   │       │       │   ├── entities/       # JPA Entities
 │   │       │       │   ├── enums/          # Enum (Role, Status, …)
-│   │       │       │   ├── repositories/  # JPA Repositories
-│   │       │       │   └── services/       # Business Services
+│   │       │       │   ├── exception/      # Xử lý ngoại lệ (Global Exception)
+│   │       │       │   ├── repositories/   # JPA Repositories
+│   │       │       │   ├── services/       # Business Services
+│   │       │       │   └── utils/          # Utility classes
 │   │       │       │
 │   │       │       └── LuxeRestaurantApplication.java
 │   │       │
 │   │       └── resources/
 │   │           ├── db/          # Script SQL / migration
-│   │           ├── static/      # Tài nguyên tĩnh (nếu có)
-│   │           ├── templates/   # Template (cũ – không dùng nếu REST)
+│   │           ├── static/      # Tài nguyên tĩnh
+│   │           ├── templates/   # Template
 │   │           └── application.yml
 │   │
 │   └── pom.xml
 │
 ├── restaurant-fe/               # Frontend – React + Vite
-│   ├── dist/                    # Build production
-│   ├── node_modules/
-│   ├── public/                 # Public assets
+│   ├── public/                  # Public assets
 │   ├── src/
-│   │   ├── admin/               # Trang & chức năng Admin
+│   │   ├── admin/               # Trang & chức năng Admin (Quản lý đơn, món, kho...)
 │   │   ├── assets/              # Ảnh, icon, font
 │   │   ├── Chatbot/             # Chatbot module
 │   │   ├── components/          # Component dùng chung
-│   │   ├── context/             # React Context (Auth, Cart, ...)
-│   │   ├── dndx/                # Drag & Drop (DnD)
-│   │   ├── giohang/             # Giỏ hàng
+│   │   ├── context/             # React Context (AuthContext...)
+│   │   ├── dndx/                # Đăng nhập, đăng ký, trang thông tin cá nhân
+│   │   ├── giohang/             # Giỏ hàng & Đơn hàng của tôi
 │   │   ├── i18n/                # Đa ngôn ngữ
 │   │   ├── Lienhe/              # Trang liên hệ
 │   │   ├── Loading/             # Loading / Spinner
@@ -122,6 +122,7 @@
 │   └── vite.config.js
 │
 └── README.md
+```
 ## Các lỗi thường gặp
 - Không kết nối được database → kiểm tra username/password.
 - Lỗi CORS → kiểm tra cấu hình Spring Security.
